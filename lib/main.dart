@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/flutter/http/Constants.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/config_bean_entity.dart';
+import 'package:flutter_dio_module/com/xxx/rxdio/CallBack.dart';
+import 'package:flutter_dio_module/com/xxx/rxdio/RxDio.dart';
 
 import 'com/flutter/http/adapter/Method.dart';
 
@@ -51,7 +56,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String _counter = "0";
 
   void _incrementCounter() {
     setState(() {
@@ -60,13 +65,40 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
       NetworkManager.instance;
 
-      Future futur = NetworkManager.request<ConfigBeanEntity>(Constants.CONFIG, onSuccess:(datas){
+      //future解析方式返回
+      Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG, onSuccess:(datas){
         print("=====>"+datas!.wsurl);
-      }, onError: (error){},method: Method.Get);
+      }, onError: (error){
+
+      },method: Method.Get);
       print(futur.toString());
+
+
+      //观察着模式
+      ApiService().post(Constants.CONFIG,Map(), Method.Get).listen((event) {
+        Map<String, dynamic> map = json.decode(event);
+        BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
+        print("listen1 "+event.toString());
+        print("listen1 "+(configBeanEntity.data as ConfigBeanEntity).gurl);
+        _counter = event.toString();
+      });
+
+
+      //RX dio模式请求网络
+      RxDio<BaseBean<ConfigBeanEntity>>()
+        ..setUrl(Constants.CONFIG)
+        ..setRequestMethod(Method.Get)
+        ..setParams(null)
+        ..setCacheMode(CacheMode.NO_CACHE)
+        ..setJsonTransFrom((data) {
+        Map<String, dynamic> map = json.decode(data);
+        return BaseBean<ConfigBeanEntity>.fromJson(map);
+      })
+      ..call(new CallBack(onNetFinish: (data){
+        print("object"+data.data!.gurl);
+      }));
     });
   }
 
