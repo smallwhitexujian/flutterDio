@@ -34,7 +34,9 @@ class MyApp extends StatelessWidget {
     );
   }
 
+
 }
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -50,13 +52,50 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
+
 }
+
+
 
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "0";
+
+
+  void test() {
+    NetworkManager.instance;
+
+    //future解析方式返回
+    Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(
+        Constants.CONFIG, onSuccess: (datas) {
+      print("=====>" + datas!.wsurl);
+    }, onError: (error) {}, method: Method.Get);
+    print(futur.toString());
+
+    //观察着模式
+    ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
+      Map<String, dynamic> map = json.decode(event);
+      BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
+      print("listen1 " + event.toString());
+      print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+    });
+
+    //RX dio模式请求网络
+    RxDio<BaseBean<ConfigBeanEntity>>()
+      ..setUrl(Constants.CONFIG)
+      ..setRequestMethod(Method.Get)
+      ..setParams(null)
+      ..setCacheMode(CacheMode.NO_CACHE)
+      ..setJsonTransFrom((data) {
+        Map<String, dynamic> map = json.decode(data);
+        return BaseBean<ConfigBeanEntity>.fromJson(map);
+      })
+      ..call(new CallBack(onNetFinish: (data) {
+        print("object" + data.data!.gurl);
+      }));
+  }
+
 
   void _incrementCounter() {
     setState(() {
@@ -65,41 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      NetworkManager.instance;
-
-      //future解析方式返回
-      Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG, onSuccess:(datas){
-        print("=====>"+datas!.wsurl);
-      }, onError: (error){
-
-      },method: Method.Get);
-      print(futur.toString());
-
-
-      //观察着模式
-      ApiService().post(Constants.CONFIG,Map(), Method.Get).listen((event) {
-        Map<String, dynamic> map = json.decode(event);
-        BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-        print("listen1 "+event.toString());
-        print("listen1 "+(configBeanEntity.data as ConfigBeanEntity).gurl);
-        _counter = event.toString();
-      });
-
-
-      //RX dio模式请求网络
-      RxDio<BaseBean<ConfigBeanEntity>>()
-        ..setUrl(Constants.CONFIG)
-        ..setRequestMethod(Method.Get)
-        ..setParams(null)
-        ..setCacheMode(CacheMode.NO_CACHE)
-        ..setJsonTransFrom((data) {
-        Map<String, dynamic> map = json.decode(data);
-        return BaseBean<ConfigBeanEntity>.fromJson(map);
-      })
-      ..call(new CallBack(onNetFinish: (data){
-        print("object"+data.data!.gurl);
-      }));
     });
+
+    test();
   }
 
   @override

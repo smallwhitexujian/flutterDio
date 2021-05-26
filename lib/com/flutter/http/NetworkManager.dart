@@ -141,7 +141,7 @@ class NetworkManager {
             "服务器错误${response.statusCode},message${response.statusMessage}");
       }
     } on DioError catch (error) {
-      return Future.error(error);
+      return await Future.error(error);
     }
   }
 }
