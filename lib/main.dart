@@ -8,10 +8,21 @@ import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/config_bean_entity.dart';
 import 'package:flutter_dio_module/com/xxx/rxdio/CallBack.dart';
 import 'package:flutter_dio_module/com/xxx/rxdio/RxDio.dart';
+import 'package:flutter_dio_module/com/xxx/rxdio/utils/CacheManagers.dart';
 
 import 'com/flutter/http/adapter/Method.dart';
 
-void main() => runApp(MyApp());
+void main() => Global.init().then((e)=>runApp(MyApp()));
+
+//初始类
+class Global {
+  //初始化方法全部存储在这里
+  static Future init() async{
+    return CacheManagers.init();
+  }
+}
+
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -33,10 +44,7 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
-
-
 }
-
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -54,17 +62,12 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
-
 }
-
-
 
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "0";
 
-
   void test() {
-    NetworkManager.instance;
 
     //future解析方式返回
     Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(
@@ -73,29 +76,34 @@ class _MyHomePageState extends State<MyHomePage> {
     }, onError: (error) {}, method: Method.Get);
     print(futur.toString());
 
-    //观察着模式
-    ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
-      Map<String, dynamic> map = json.decode(event);
-      BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-      print("listen1 " + event.toString());
-      print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
-    });
+    // //观察着模式
+    // ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
+    //   Map<String, dynamic> map = json.decode(event);
+    //   BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
+    //   print("listen1 " + event.toString());
+    //   print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+    // });
 
     //RX dio模式请求网络
     RxDio<BaseBean<ConfigBeanEntity>>()
       ..setUrl(Constants.CONFIG)
       ..setRequestMethod(Method.Get)
       ..setParams(null)
-      ..setCacheMode(CacheMode.NO_CACHE)
+      ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
       ..setJsonTransFrom((data) {
-        Map<String, dynamic> map = json.decode(data);
-        return BaseBean<ConfigBeanEntity>.fromJson(map);
+        if (data != null) {
+          Map<String, dynamic> map = json.decode(data);
+          return BaseBean<ConfigBeanEntity>.fromJson(map);
+        }
+        return BaseBean<ConfigBeanEntity>.fromJson(new Map());
       })
       ..call(new CallBack(onNetFinish: (data) {
         print("object" + data.data!.gurl);
+      },
+      onCacheFinish: (data){
+        print("object" + data.data!.gurl);
       }));
   }
-
 
   void _incrementCounter() {
     setState(() {

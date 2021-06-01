@@ -1,10 +1,8 @@
-// ignore: import_of_legacy_library_into_null_safe
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
-import 'bean/config_bean_entity.dart';
 import 'interceptorss/HttpLogInterceptor.dart';
 import 'Constants.dart';
 
@@ -41,7 +39,7 @@ class NetworkManager {
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
-  static Future request<T>(String url,
+  static Future<Response> request<T>(String url,
       {Method method = Method.Post,
       Map<String, dynamic>? params,
       Function(T? t)? onSuccess,
@@ -76,12 +74,7 @@ class NetworkManager {
               .put(url, queryParameters: params);
           break;
       }
-      if (response.statusCode == 200) {
-        return response.data;
-      } else {
-        return Future.error(
-            "服务器错误${response.statusCode},message${response.statusMessage}");
-      }
+      return response;
     } on DioError catch (error) {
       return Future.error(error);
     }
@@ -100,9 +93,9 @@ class NetworkManager {
     if (interceptor != null) {
       //将自定义拦截器加入
       interceptors.add(interceptor);
+      NetworkManager.instance.dio.interceptors.addAll(interceptors);
     }
     // 统一添加到拦截区中
-    NetworkManager.instance.dio.interceptors.addAll(interceptors);
     // 发送请求
     Response response;
     try {
