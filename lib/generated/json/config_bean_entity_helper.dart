@@ -1,4 +1,4 @@
-import 'package:flutter_dio_module/com/flutter/http/bean/config_bean_entity.dart';
+import 'package:flutter_dio_module/com/app,data/config_bean_entity.dart';
 
 configBeanEntityFromJson(ConfigBeanEntity data, Map<String, dynamic> json) {
 	if (json['main'] != null) {

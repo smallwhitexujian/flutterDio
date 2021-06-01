@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/utils/DatabaseSql.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/utils/MD5Utils.dart';
+
+import 'DatabaseSql.dart';
+import 'MD5Utils.dart';
 
 ///缓存管理类
 class CacheManagers {
@@ -9,8 +10,7 @@ class CacheManagers {
   }
 
   //创建缓存的key
-  static String getCacheKayFromPath(
-      String? path, Map<String, dynamic>? params) {
+  static String getCacheKayFromPath(String? path, Map<String, dynamic>? params) {
     String cacheKey = "";
     if (path != null && path.length > 0) {
       cacheKey = path;
@@ -22,7 +22,7 @@ class CacheManagers {
         cacheKey = cacheKey + key + value;
       });
     }
-    cacheKey = MD5Utils.generate_MD5(cacheKey);
+    cacheKey = MD5Utils.generateMD5(cacheKey);
     return cacheKey;
   }
 

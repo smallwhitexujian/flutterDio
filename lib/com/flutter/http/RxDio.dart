@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/CallBack.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/utils/CacheManagers.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
+import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'package:rxdart/rxdart.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
@@ -37,6 +36,12 @@ class RxDio<T> {
     return data as T;
   };
 
+
+  //初始化缓存数据库
+  void initDb(){
+    CacheManagers.init();
+  }
+
   void setRequestMethod(Method method) {
     this.httpMethod = method;
   }
@@ -63,6 +68,8 @@ class RxDio<T> {
 
   RxDio() : super();
 
+
+  //网络请求以及数据流程控制
   void call(CallBack<T> callBack) {
     //创建创建数据流控制对象,
     // ignore: close_sinks
@@ -76,28 +83,6 @@ class RxDio<T> {
     if (isUserCache) {
       NetworkManager.instance.dio.interceptors.add(CacheManagers.createCacheInterceptor(url, params));
     }
-
-    //使用观察这模式观察数据流
-    Observable(controller.stream).listen((requestData) {
-      switch (requestData.requestType) {
-        case RequestType.NETWORK:
-          //网络数据
-          callBack.onNetFinish!(requestData.data);
-          break;
-        case RequestType.CACHE:
-          //缓存数据
-          if (callBack.onCacheFinish != null) {
-            callBack.onCacheFinish!(requestData.data);
-          }
-          break;
-        case RequestType.UNKOWN:
-          //其他来源
-          if(callBack.onUnkownFinish!=null){
-            callBack.onUnkownFinish!(requestData.data);
-          }
-          break;
-      }
-    });
 
     //判断缓存模型没有缓存
     switch (cacheMode) {
@@ -127,7 +112,7 @@ class RxDio<T> {
         //现货区缓存,在获取网络数据
         CacheManagers.getCache(url, params).then((list) => {
               if (list != null && list.length > 0){
-                  controller.add(new RequestData(RequestType.CACHE, jsonTransformation(json.decoder.convert(list[0]['value']))))
+                  controller.add(new RequestData(RequestType.CACHE, jsonTransformation(list[0]['value'])))
                 } else {
                   controller.add(new RequestData(RequestType.CACHE, jsonTransformation(null), statusCode: 400))
                 }
@@ -137,7 +122,33 @@ class RxDio<T> {
         });
         break;
       case CacheMode.DEFAULT:
+      //默认没有缓存
+        NetworkManager.request(url, params: params, method: httpMethod).then((response) {
+          controller.add(new RequestData(RequestType.NETWORK, jsonTransformation(response.data)));
+        });
         break;
     }
+
+    //使用观察这模式观察数据流
+    Observable(controller.stream).listen((requestData) {
+      switch (requestData.requestType) {
+        case RequestType.NETWORK:
+        //网络数据
+          callBack.onNetFinish!(requestData.data);
+          break;
+        case RequestType.CACHE:
+        //缓存数据
+          if (callBack.onCacheFinish != null) {
+            callBack.onCacheFinish!(requestData.data);
+          }
+          break;
+        case RequestType.UNKOWN:
+        //其他来源
+          if(callBack.onUnkownFinish!=null){
+            callBack.onUnkownFinish!(requestData.data);
+          }
+          break;
+      }
+    });
   }
 }

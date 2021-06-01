@@ -1,6 +1,7 @@
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 import 'package:flutter_dio_module/generated/json/base/json_field.dart';
 
+//测试样例
 class ConfigBeanEntity with JsonConvert<ConfigBeanEntity> {
 	String main="";
 	String wsurl="";

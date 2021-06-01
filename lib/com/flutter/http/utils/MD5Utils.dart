@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 
 class MD5Utils{
   // md5 加密
-  static String generate_MD5(String data) {
+  static String generateMD5(String data) {
     var content = new Utf8Encoder().convert(data);
     var digest = md5.convert(content);
     // 这里其实就是 digest.toString()

@@ -1,28 +1,27 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/flutter/http/Constants.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
-import 'package:flutter_dio_module/com/flutter/http/bean/config_bean_entity.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/CallBack.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/RxDio.dart';
-import 'package:flutter_dio_module/com/xxx/rxdio/utils/CacheManagers.dart';
+import 'package:flutter_dio_module/com/app,data/config_bean_entity.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
 
 import 'com/flutter/http/adapter/Method.dart';
+import 'com/flutter/http/utils/CacheManagers.dart';
 
-void main() => Global.init().then((e)=>runApp(MyApp()));
+void main() => Global.init().then((e) => runApp(MyApp()));
 
 //初始类
 class Global {
   //初始化方法全部存储在这里
-  static Future init() async{
-    return CacheManagers.init();
+  static Future init() async {
+    return RxDio().initDb();
   }
 }
-
-
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -68,41 +67,43 @@ class _MyHomePageState extends State<MyHomePage> {
   String _counter = "0";
 
   void test() {
-
-    // //future解析方式返回
-    // Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(
-    //     Constants.CONFIG, onSuccess: (datas) {
-    //   print("=====>" + datas!.wsurl);
-    // }, onError: (error) {}, method: Method.Get);
-    // print(futur.toString());
+    //future解析方式返回
+    NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG,
+        onSuccess: (datas) {
+      print("泛型解析类：" + datas!.wsurl);
+    }, method: Method.Get);
 
     //观察着模式
     ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
-      Map<String, dynamic> map = json.decode(event);
+      var data = event as Response;
+      Map<String, dynamic> map = json.decode(data.data);
       BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-      print("listen1 " + event.toString());
-      print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+      print("观察者模式： " + data.toString());
+      print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
     });
 
-    // //RX dio模式请求网络
-    // RxDio<BaseBean<ConfigBeanEntity>>()
-    //   ..setUrl(Constants.CONFIG)
-    //   ..setRequestMethod(Method.Get)
-    //   ..setParams(null)
-    //   ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
-    //   ..setJsonTransFrom((data) {
-    //     if (data != null) {
-    //       Map<String, dynamic> map = json.decode(data);
-    //       return BaseBean<ConfigBeanEntity>.fromJson(map);
-    //     }
-    //     return BaseBean<ConfigBeanEntity>.fromJson(new Map());
-    //   })
-    //   ..call(new CallBack(onNetFinish: (data) {
-    //     print("object" + data.data!.gurl);
-    //   },
-    //   onCacheFinish: (data){
-    //     print("object" + data.data!.gurl);
-    //   }));
+    //RX dio模式请求网络
+    RxDio<BaseBean<ConfigBeanEntity>>()
+      ..setUrl(Constants.CONFIG)
+      ..setRequestMethod(Method.Get)
+      ..setParams(null)
+      ..setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+      ..setJsonTransFrom((data) {
+        if (data != null) {
+          Map<String, dynamic> map = json.decode(data);
+          return BaseBean<ConfigBeanEntity>.fromJson(map);
+        }
+        return BaseBean<ConfigBeanEntity>.fromJson(new Map());
+      })
+      ..call(new CallBack(onNetFinish: (data) {
+        if (data.data != null) {
+          print("网络请求返回数据：" + data.data!.gurl);
+        }
+      }, onCacheFinish: (data) {
+        if (data.data != null) {
+          print("缓存数据返回：" + data.data!.gurl);
+        }
+      }));
   }
 
   void _incrementCounter() {
