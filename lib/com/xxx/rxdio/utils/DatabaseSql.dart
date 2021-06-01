@@ -43,8 +43,7 @@ class DatabaseSql {
             onCreate: (Database db, int version) async {
       await db.execute(
           'CREATE TABLE If Not Exists $dbTableName (cacheKey TEXT PRIMARY KEY ,value TEXT)');
-    },
-            //如果表存在则直接打开
+    }, //如果表存在则直接打开
             onOpen: (Database db) async {
       await db.execute(
           'CREATE TABLE If Not Exists $dbTableName (cacheKey TEXT PRIMARY KEY ,value TEXT)');

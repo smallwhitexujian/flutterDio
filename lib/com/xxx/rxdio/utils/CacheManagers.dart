@@ -27,10 +27,8 @@ class CacheManagers {
   }
 
   //获取缓存
-  static Future<List<Map<String, dynamic>>> getCache(
-      String? path, Map<String, dynamic>? params) async {
-    return DatabaseSql.queryHttp(
-        DatabaseSql.database, getCacheKayFromPath(path, params));
+  static Future<List<Map<String, dynamic>>> getCache(String? path, Map<String, dynamic>? params) async {
+    return DatabaseSql.queryHttp(DatabaseSql.database, getCacheKayFromPath(path, params));
   }
 
   //保存缓存
@@ -45,8 +43,7 @@ class CacheManagers {
   }
 
   //缓存拦截器
-  static InterceptorsWrapper createCacheInterceptor(
-      String path, Map<String, dynamic>? params) {
+  static InterceptorsWrapper createCacheInterceptor(String path, Map<String, dynamic>? params) {
     InterceptorsWrapper interceptorsWrapper =
         InterceptorsWrapper(onRequest: (RequestOptions options) async {
       return options;

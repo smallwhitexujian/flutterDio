@@ -69,40 +69,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void test() {
 
-    //future解析方式返回
-    Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(
-        Constants.CONFIG, onSuccess: (datas) {
-      print("=====>" + datas!.wsurl);
-    }, onError: (error) {}, method: Method.Get);
-    print(futur.toString());
+    // //future解析方式返回
+    // Future futur = NetworkManager.requestBaseBeanData<ConfigBeanEntity>(
+    //     Constants.CONFIG, onSuccess: (datas) {
+    //   print("=====>" + datas!.wsurl);
+    // }, onError: (error) {}, method: Method.Get);
+    // print(futur.toString());
 
-    // //观察着模式
-    // ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
-    //   Map<String, dynamic> map = json.decode(event);
-    //   BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-    //   print("listen1 " + event.toString());
-    //   print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
-    // });
+    //观察着模式
+    ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
+      Map<String, dynamic> map = json.decode(event);
+      BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
+      print("listen1 " + event.toString());
+      print("listen1 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+    });
 
-    //RX dio模式请求网络
-    RxDio<BaseBean<ConfigBeanEntity>>()
-      ..setUrl(Constants.CONFIG)
-      ..setRequestMethod(Method.Get)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
-      ..setJsonTransFrom((data) {
-        if (data != null) {
-          Map<String, dynamic> map = json.decode(data);
-          return BaseBean<ConfigBeanEntity>.fromJson(map);
-        }
-        return BaseBean<ConfigBeanEntity>.fromJson(new Map());
-      })
-      ..call(new CallBack(onNetFinish: (data) {
-        print("object" + data.data!.gurl);
-      },
-      onCacheFinish: (data){
-        print("object" + data.data!.gurl);
-      }));
+    // //RX dio模式请求网络
+    // RxDio<BaseBean<ConfigBeanEntity>>()
+    //   ..setUrl(Constants.CONFIG)
+    //   ..setRequestMethod(Method.Get)
+    //   ..setParams(null)
+    //   ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
+    //   ..setJsonTransFrom((data) {
+    //     if (data != null) {
+    //       Map<String, dynamic> map = json.decode(data);
+    //       return BaseBean<ConfigBeanEntity>.fromJson(map);
+    //     }
+    //     return BaseBean<ConfigBeanEntity>.fromJson(new Map());
+    //   })
+    //   ..call(new CallBack(onNetFinish: (data) {
+    //     print("object" + data.data!.gurl);
+    //   },
+    //   onCacheFinish: (data){
+    //     print("object" + data.data!.gurl);
+    //   }));
   }
 
   void _incrementCounter() {
