@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
-import 'package:flutter_dio_module/com/flutter/http/Constants.dart';
+import 'package:flutter_dio_module/com/app,data/Constants.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/app,data/config_bean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
+import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
 
 import 'com/flutter/http/adapter/Method.dart';
 import 'com/flutter/http/utils/CacheManagers.dart';
@@ -64,23 +65,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _counter = "0";
+  String _counter = "";
 
   void test() {
     //future解析方式返回
-    NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG,
-        onSuccess: (datas) {
-      print("泛型解析类：" + datas!.wsurl);
-    }, method: Method.Get);
-
-    //观察着模式
-    ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
-      var data = event as Response;
-      Map<String, dynamic> map = json.decode(data.data);
-      BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-      print("观察者模式： " + data.toString());
-      print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
-    });
+    // NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG,
+    //     onSuccess: (datas) {
+    //   print("泛型解析类：" + datas!.wsurl);
+    // }, method: Method.Get);
+    //
+    // //观察着模式
+    // ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
+    //   var data = event as Response;
+    //   Map<String, dynamic> map = json.decode(data.data);
+    //   BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
+    //   print("观察者模式： " + data.toString());
+    //   print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+    // });
 
     //RX dio模式请求网络
     RxDio<BaseBean<ConfigBeanEntity>>()
@@ -97,11 +98,11 @@ class _MyHomePageState extends State<MyHomePage> {
       })
       ..call(new CallBack(onNetFinish: (data) {
         if (data.data != null) {
-          print("网络请求返回数据：" + data.data!.gurl);
+          _counter = "网络请求返回数据：" + data.data!.gurl;
         }
       }, onCacheFinish: (data) {
         if (data.data != null) {
-          print("缓存数据返回：" + data.data!.gurl);
+          _counter = _counter+("缓存数据返回：" + data.data!.gurl);
         }
       }));
   }

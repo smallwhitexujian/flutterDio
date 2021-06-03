@@ -42,15 +42,26 @@ class CacheManagers {
     });
   }
 
+  //清楚缓存数据,删除表
+  static clearCache() async{
+    // await Future.delayed(const Duration(seconds:1));
+    DatabaseSql.clearData(DatabaseSql.database).then((value) => {
+        DatabaseSql.initDatabase()
+    });
+
+  }
   //缓存拦截器
-  static InterceptorsWrapper createCacheInterceptor(String path, Map<String, dynamic>? params) {
-    InterceptorsWrapper interceptorsWrapper =
-        InterceptorsWrapper(onRequest: (RequestOptions options) async {
+  static InterceptorsWrapper createCacheInterceptor() {
+    String path = "";
+    Map<String,dynamic>? map;
+    InterceptorsWrapper interceptorsWrapper = InterceptorsWrapper(onRequest: (RequestOptions options) async {
+      path = options.path;
+      map = options.queryParameters;
       return options;
     }, onError: (DioError e) {
       return e;
     }, onResponse: (Response response) {
-      saveCache(path, params, response.data);
+      saveCache(path, map, response.data);
       return response;
     });
     return interceptorsWrapper;

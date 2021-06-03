@@ -1,7 +1,7 @@
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'Constants.dart';
+import '../../app,data/Constants.dart';
 import 'adapter/Method.dart';
 
 class ApiService {

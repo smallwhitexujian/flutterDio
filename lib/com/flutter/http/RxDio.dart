@@ -62,9 +62,6 @@ class RxDio<T> {
     this.jsonTransformation = jsonTransformation;
   }
 
-  void setInterceptor(Interceptor interceptor) {
-    NetworkManager.instance.dio.interceptors.add(interceptor);
-  }
 
   RxDio() : super();
 
@@ -80,9 +77,7 @@ class RxDio<T> {
     if (callBack == null) {
       throw Exception("callBack对象为null");
     }
-    if (isUserCache) {
-      NetworkManager.instance.dio.interceptors.add(CacheManagers.createCacheInterceptor(url, params));
-    }
+
 
     //判断缓存模型没有缓存
     switch (cacheMode) {
@@ -109,7 +104,7 @@ class RxDio<T> {
         });
         break;
       case CacheMode.FIRST_CACHE_THEN_REQUEST:
-        //现货区缓存,在获取网络数据
+        //先获取缓存,在获取网络数据
         CacheManagers.getCache(url, params).then((list) => {
               if (list != null && list.length > 0){
                   controller.add(new RequestData(RequestType.CACHE, jsonTransformation(list[0]['value'])))

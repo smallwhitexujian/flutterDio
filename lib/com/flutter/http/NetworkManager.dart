@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
+import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'interceptorss/HttpLogInterceptor.dart';
-import 'Constants.dart';
+import '../../app,data/Constants.dart';
 
 ///单例模式
 class NetworkManager {
@@ -26,7 +27,8 @@ class NetworkManager {
           sendTimeout: 10000,
           headers: {"Content-Type": "application/json"})
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor());
+      ..interceptors.add(HttpLogInterceptor())
+      ..interceptors.add(CacheManagers.createCacheInterceptor());
     // ..interceptors.add(HttpLogInterceptor(GlobalConfig.isDebug))
     // ..interceptors.add(ErrorInterceptor());
   }

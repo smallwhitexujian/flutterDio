@@ -34,6 +34,23 @@ class DatabaseSql {
   static delDB() async {
     createDatabase().then((path) => {deleteDatabase(path)});
   }
+  
+  //删除表
+  static Future clearData(Database db) async{
+    await database.rawQuery('SELECT * FROM $dbTableName limit 1').then((list) => {
+      closeDb(db, list)
+    });
+  }
+
+  //删除表并关闭数据库
+  static Set<Map<String ,dynamic>> closeDb(Database db,List<Map<String ,dynamic>> list){
+    if(list != null && list.length >0){
+      db.execute('DROP TABLE $dbTableName');
+      db.close();
+      deleteDatabase(db.path);
+    }
+    return new Set<Map<String ,dynamic>> ();
+  }
 
   //打开数据库
   static Future<Database> openCacheDatabase(String paths) async {
