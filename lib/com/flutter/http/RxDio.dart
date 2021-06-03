@@ -67,17 +67,11 @@ class RxDio<T> {
 
 
   //网络请求以及数据流程控制
-  void call(CallBack<T> callBack) {
+  void call(CallBack<T>? callBack) {
     //创建创建数据流控制对象,
     // ignore: close_sinks
     StreamController<RequestData<T>> controller =
         new StreamController<RequestData<T>>();
-
-    // ignore: unnecessary_null_comparison
-    if (callBack == null) {
-      throw Exception("callBack对象为null");
-    }
-
 
     //判断缓存模型没有缓存
     switch (cacheMode) {
@@ -129,17 +123,19 @@ class RxDio<T> {
       switch (requestData.requestType) {
         case RequestType.NETWORK:
         //网络数据
-          callBack.onNetFinish!(requestData.data);
+          if(callBack!=null){
+            callBack.onNetFinish!(requestData.data);
+          }
           break;
         case RequestType.CACHE:
         //缓存数据
-          if (callBack.onCacheFinish != null) {
+          if (callBack!=null&&callBack.onCacheFinish != null) {
             callBack.onCacheFinish!(requestData.data);
           }
           break;
         case RequestType.UNKOWN:
         //其他来源
-          if(callBack.onUnkownFinish!=null){
+          if(callBack!=null&&callBack.onUnkownFinish!=null){
             callBack.onUnkownFinish!(requestData.data);
           }
           break;

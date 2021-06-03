@@ -1,18 +1,9 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/app,data/Constants.dart';
-import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
-import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
-import 'package:flutter_dio_module/com/app,data/config_bean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
-import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
-
 import 'com/flutter/http/adapter/Method.dart';
-import 'com/flutter/http/utils/CacheManagers.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -82,29 +73,16 @@ class _MyHomePageState extends State<MyHomePage> {
     //   print("观察者模式： " + data.toString());
     //   print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
     // });
+    ApiService().getConfig(Constants.CONFIG, Method.Get, null, CacheMode.FIRST_CACHE_THEN_REQUEST,callBack:new CallBack(
+      onCacheFinish:(data) {
+        _counter = data.data!.gurl;
+        print("=====>"+_counter);
+      }, onNetFinish:(data) {
+      _counter = data.data!.zhichi.toString();
+      print("===1==>"+_counter);
+    }
+    ));
 
-    //RX dio模式请求网络
-    RxDio<BaseBean<ConfigBeanEntity>>()
-      ..setUrl(Constants.CONFIG)
-      ..setRequestMethod(Method.Get)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
-      ..setJsonTransFrom((data) {
-        if (data != null) {
-          Map<String, dynamic> map = json.decode(data);
-          return BaseBean<ConfigBeanEntity>.fromJson(map);
-        }
-        return BaseBean<ConfigBeanEntity>.fromJson(new Map());
-      })
-      ..call(new CallBack(onNetFinish: (data) {
-        if (data.data != null) {
-          _counter = "网络请求返回数据：" + data.data!.gurl;
-        }
-      }, onCacheFinish: (data) {
-        if (data.data != null) {
-          _counter = _counter+("缓存数据返回：" + data.data!.gurl);
-        }
-      }));
   }
 
   void _incrementCounter() {
