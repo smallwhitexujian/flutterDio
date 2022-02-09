@@ -1,4 +1,3 @@
-import 'package:flutter_dio_module/com/flutter/http/utils/MD5Utils.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -46,7 +45,7 @@ class DatabaseSql {
   //删除表并关闭数据库
   static Set<Map<String, dynamic>> closeDb(
       Database db, List<Map<String, dynamic>> list) {
-    if (list != null && list.length > 0) {
+    if (list.length > 0) {
       db.execute('DROP TABLE $dbTableName');
       db.close();
       deleteDatabase(db.path);

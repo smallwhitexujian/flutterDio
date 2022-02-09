@@ -87,7 +87,7 @@ class RxDio<T> {
                 RequestType.NETWORK, jsonTransformation(response.data)));
           } else {
             CacheManagers.getCache(url, params).then((list) => {
-                  if (list != null && list.length > 0)
+                  if (list.length > 0)
                     {
                       controller.add(new RequestData(RequestType.CACHE,
                           jsonTransformation(list[0]['value'])))
@@ -105,7 +105,7 @@ class RxDio<T> {
       case CacheMode.FIRST_CACHE_THEN_REQUEST:
         //先获取缓存,在获取网络数据
         CacheManagers.getCache(url, params).then((list) => {
-              if (list != null && list.length > 0)
+              if (list.length > 0)
                 {
                   controller.add(new RequestData(
                       RequestType.CACHE, jsonTransformation(list[0]['value'])))

@@ -36,7 +36,6 @@ class BaseBean<T> {
 
   @override
   String toString() {
-    print("code : ${code} " + "data : ${data} " + "message : ${message} ");
     return super.toString();
   }
 }

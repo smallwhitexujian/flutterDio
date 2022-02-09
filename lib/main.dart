@@ -1,10 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dio_module/com/app,data/config_bean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/app,data/Constants.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
+import 'com/app,data/wanbean_entity.dart';
 import 'com/flutter/http/adapter/Method.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
@@ -61,27 +59,16 @@ class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
   void test() {
-    //future解析方式返回
-    // NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG,
-    //     onSuccess: (datas) {
-    //   print("泛型解析类：" + datas!.wsurl);
-    // }, method: Method.Get);
-    //
     //观察着模式
-    ApiService().post(Constants.config, null, Method.Get).listen((event) {
-      // Map<String, dynamic> map = json.decode(data.data);
-      // BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-      print("Stream 流结果： " + event.toString());
-      // print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
+    ApiService()
+        .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+        .listen((data) {
+      print("Stream 流结果： " + data.datas.toString());
     });
 
-    // ApiService().getResponse(
-    //     Constants.config, Method.Get, null, CacheMode.FIRST_CACHE_THEN_REQUEST,
-    //     callBack: new CallBack(onCacheFinish: (data) {
-    //       print("=====>" + data.toString());
-    //     }, onNetFinish: (data) {
-    //       print("===1==>" + data.toString());
-    //     }));
+    ApiService()
+        .getFutureResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+        .then((value) => {print("Future 结果： " + value.toString())});
   }
 
   void _incrementCounter() {
