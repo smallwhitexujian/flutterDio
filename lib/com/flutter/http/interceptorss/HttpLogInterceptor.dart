@@ -54,7 +54,7 @@ class HttpLogInterceptor extends Interceptor {
     if (response.data != null) {
       responseStr += "- BODY:\n ${_parseResponse(response)}";
     }
-    // printWrapped(responseStr);
+    printWrapped(responseStr);
     return super.onResponse(response, handler);
   }
 
