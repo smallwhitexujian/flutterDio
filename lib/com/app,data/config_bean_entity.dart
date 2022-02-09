@@ -1,8 +1,17 @@
-import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
+import 'package:flutter_dio_module/generated/json/config_bean_entity.g.dart';
+
 import 'package:flutter_dio_module/generated/json/base/json_field.dart';
 
 //测试样例
-class ConfigBeanEntity with JsonConvert<ConfigBeanEntity> {
+@JsonSerializable()
+class ConfigBeanEntity {
+
+	ConfigBeanEntity();
+
+	factory ConfigBeanEntity.fromJson(Map<String, dynamic> json) => $ConfigBeanEntityFromJson(json);
+
+	Map<String, dynamic> toJson() => $ConfigBeanEntityToJson(this);
+
 	String main="";
 	String wsurl="";
 	String miniMain="";
@@ -19,7 +28,15 @@ class ConfigBeanEntity with JsonConvert<ConfigBeanEntity> {
 	ConfigBeanZhichi? zhichi;
 }
 
-class ConfigBeanZhichi with JsonConvert<ConfigBeanZhichi> {
+@JsonSerializable()
+class ConfigBeanZhichi {
+
+	ConfigBeanZhichi();
+
+	factory ConfigBeanZhichi.fromJson(Map<String, dynamic> json) => $ConfigBeanZhichiFromJson(json);
+
+	Map<String, dynamic> toJson() => $ConfigBeanZhichiToJson(this);
+
 	String sysNum="";
 	String channelFlg="";
 	String groupId="";
