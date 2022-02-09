@@ -42,7 +42,7 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
 
 ## 网络请求使用方法
 
-### RxDio模式解析
+### RxDio模式解析 此方式不建议使用复用较困难
 
 ```java
     //RX dio模式请求网络
@@ -66,30 +66,23 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
       }));
 ```
 
-### 观察者模式
-
-```java
-//创建观察者对象
-class ApiService {
-  Observable post<T>(String url, Map<String, dynamic>? params, Method method) =>
-      Observable.fromFuture(NetworkManager.request<T>(Constants.CONFIG,
-              params: params, method: method)).asBroadcastStream();
-}
-//观察着模式
-ApiService().post(Constants.CONFIG, Map(), Method.Get).listen((event) {
-  var data = event as Response;
-  Map<String, dynamic> map = json.decode(data.data);
-  BaseBean configBeanEntity = BaseBean<ConfigBeanEntity>.fromJson(map);
-  print("观察者模式： " + data.toString());
-  print("观察者模式 " + (configBeanEntity.data as ConfigBeanEntity).gurl);
-});
+### 观察者模式 泛型解析
 
 ```
+//Stream支持,默认多订阅模式 Stream.asBroadcastStream()可以将一个单订阅模式的 Stream 转换成一个多订阅模式的 Stream isBroadcast 属性可以判断当前 Stream 所处的模式
+//assert(stream.isBroadcast == false);
+//stream.first.then(print);
+//stream.last.then(print);// Bad state: Stream already has subscriber.
 
-### 泛型解析
+ ApiService()
+        .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+        .listen((data) {
+      print("Stream 流结果： " + data.datas.toString());
+    });
 
-```
-NetworkManager.requestBaseBeanData<ConfigBeanEntity>(Constants.CONFIG, onSuccess: (datas) {
-  print("泛型解析类：" + datas!.wsurl);
-},  method: Method.Get);
+
+//Future 方式
+    ApiService()
+        .getFutureResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+        .then((value) => {print("Future 结果： " + value.toString())});
 ```
