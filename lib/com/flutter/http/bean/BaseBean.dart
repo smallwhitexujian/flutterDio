@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 
 class BaseBean<T> {
@@ -13,8 +11,8 @@ class BaseBean<T> {
     if (json['data'] != null && json['data'] != 'null') {
       data = JsonConvert.fromJsonAsT<T>(json['data']);
     }
-    code = json['code'];
-    message = json['message'];
+    code = json['errorCode'];
+    message = json['errorMsg'];
   }
 
   Map<String, dynamic> toJson() {
@@ -22,8 +20,23 @@ class BaseBean<T> {
     if (this.data != null) {
       data['data'] = this.data;
     }
-    data['code'] = this.code;
-    data['message'] = this.message;
+    data['errorCode'] = this.code;
+    data['errorMsg'] = this.message;
     return data;
+  }
+
+  //判断接口成功状态，一般情况是0或者200状态 根据业务判断
+  bool isSuccess() {
+    if (code == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  String toString() {
+    print("code : ${code} " + "data : ${data} " + "message : ${message} ");
+    return super.toString();
   }
 }

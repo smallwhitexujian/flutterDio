@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart';
 
 //网络日志拦截
-class HttpLogInterceptor  extends Interceptor {
+class HttpLogInterceptor extends Interceptor {
   @override
-  Future onRequest(RequestOptions options) async {
+  Future onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     String requestStr = "\n==================== REQUEST ====================\n"
-        "- URL:\n${options.baseUrl + options.path}\n"
-        "- METHOD: ${options.method}\n";
-    requestStr += "- HEADER:\n${options.headers.mapToStructureString()}\n";
-
+        "- URL: ${options.baseUrl + options.path}\n"
+        "- METHOD: ${options.method}\n"
+        "- HEADER:\n ${options.headers.mapToStructureString()}\n"
+        "- QueryParameters:\n ${options.queryParameters}\n";
     final data = options.data;
     if (data != null) {
       if (data is Map)
@@ -17,36 +18,36 @@ class HttpLogInterceptor  extends Interceptor {
         requestStr += "- BODY:\n${data.toString()}\n";
     }
     print(requestStr);
-    return options;
+    return super.onRequest(options, handler);
   }
 
   @override
-  Future onError(DioError err) async {
+  Future onError(DioError err, ErrorInterceptorHandler handler) async {
     String errorStr = "\n==================== ERROR ====================\n"
-        "- URL:\n${err.request.baseUrl + err.request.path}\n"
-        "- METHOD: ${err.request.method}\n";
+        "- URL:\n${err.requestOptions.baseUrl + err.requestOptions.path}\n"
+        "- METHOD: ${err.requestOptions.method}\n";
 
-    errorStr +=
-    "- HEADER:\n${err.response.headers.toString()}\n";
-    if (err.response != null && err.response.data != null) {
+    errorStr += "- HEADER:\n${err.response?.headers.toString()}\n";
+    if (err.response != null && err.response?.data != null) {
       print('╔ ${err.type.toString()}');
-      errorStr += "- ERROR:\n${_parseResponse(err.response)}\n";
+      errorStr += "- ERROR:\n${_parseResponse(err.response!)}\n";
     } else {
       errorStr += "- ERRORTYPE: ${err.type}\n";
       errorStr += "- MSG: ${err.message}\n";
     }
     print(errorStr);
-    return err;
+    return super.onError(err, handler);
   }
 
   @override
-  Future onResponse(Response response) async {
+  Future onResponse(
+      Response response, ResponseInterceptorHandler handler) async {
     String responseStr =
         "\n==================== RESPONSE ====================\n"
-        "- URL:\n${response.request.uri}\n";
+        "- URL:\n${response.requestOptions.uri}\n";
     responseStr += "- HEADER:\n{";
     response.headers.forEach(
-            (key, list) => responseStr += "\n  " + "\"$key\" : \"$list\",");
+        (key, list) => responseStr += "\n  " + "\"$key\" : \"$list\",");
     responseStr += "\n}\n";
     responseStr += "- STATUS: ${response.statusCode}\n";
 
@@ -54,7 +55,7 @@ class HttpLogInterceptor  extends Interceptor {
       responseStr += "- BODY:\n ${_parseResponse(response)}";
     }
     printWrapped(responseStr);
-    return response;
+    return super.onResponse(response, handler);
   }
 
   void printWrapped(String text) {
@@ -120,7 +121,6 @@ extension List2StringEx on List {
       result = result.substring(0, result.length - 1);
       result += "\n$indentationStr]";
     }
-
     return result;
   }
 }

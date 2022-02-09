@@ -28,20 +28,20 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   # 三方库------------------dio--------------------------
-  dio: ^3.0.10
+  dio: ^4.0.4
   #cached_network_image: ^3.0.0
   #json解析库
-  json_annotation: ^2.0.0
+  json_annotation: ^4.4.0
   #Rx
-  rxdart: ^0.21.0
+  rxdart: ^0.27.3
   #sqflite数据库
-  sqflite: ^1.1.6+5
+  sqflite: ^2.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  json_serializable: ^2.0.0
+  json_serializable: ^6.1.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

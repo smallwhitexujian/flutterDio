@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
@@ -20,7 +21,7 @@ class NetworkManager {
     ///初始化
     dio = Dio()
       ..options = BaseOptions(
-          baseUrl: Constants.BASE_URL,
+          baseUrl: Constants.baseUrl,
           connectTimeout: 10000,
           receiveTimeout: 1000 * 60 * 60 * 24,
           responseType: ResponseType.plain,
@@ -30,7 +31,8 @@ class NetworkManager {
       ..interceptors.add(HttpLogInterceptor())
       ..interceptors.add(CacheManagers.createCacheInterceptor());
     // ..interceptors.add(HttpLogInterceptor(GlobalConfig.isDebug))
-    // ..interceptors.add(ErrorInterceptor());
+    // ..interceptors.add(ErrorInterceptor())
+    ;
   }
 
   static NetworkManager _getInstance() {
@@ -41,8 +43,9 @@ class NetworkManager {
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
-  static Future<Response> request<T>(String url,
+  static Future<Response<T>> request<T>(String url,
       {Method method = Method.Post,
+      CacheMode cacheMode = CacheMode.DEFAULT,
       Map<String, dynamic>? params,
       Function(T? t)? onSuccess,
       Function(String error)? onError,
@@ -56,7 +59,7 @@ class NetworkManager {
     // 统一添加到拦截区中
     NetworkManager.instance.dio.interceptors.addAll(interceptors);
     // 发送请求
-    Response response;
+    Response<T> response;
     try {
       switch (method) {
         case Method.Post:
@@ -76,7 +79,24 @@ class NetworkManager {
               .put(url, queryParameters: params);
           break;
       }
-      return response;
+
+      //这里判断是网络状态，并不是业务状态
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.data.toString());
+        BaseBean bean = BaseBean<T>.fromJson(data);
+        if (bean.isSuccess() && onSuccess != null) {
+          /// 返回泛型Bean
+          await onSuccess(bean.data);
+        } else {
+          if (onError != null) {
+            await onError(bean.message);
+          }
+        }
+        return response;
+      } else {
+        return await Future.error(
+            "服务器错误${response.statusCode},message${response.statusMessage}");
+      }
     } on DioError catch (error) {
       return Future.error(error);
     }
@@ -119,10 +139,11 @@ class NetworkManager {
               .put(url, queryParameters: params);
           break;
       }
+      //这里判断是网络状态，并不是业务状态
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.data.toString());
         BaseBean bean = BaseBean<T>.fromJson(data);
-        if (bean.code == 200 && onSuccess != null) {
+        if (bean.isSuccess() && onSuccess != null) {
           /// 返回泛型Bean
           await onSuccess(bean.data);
         } else {

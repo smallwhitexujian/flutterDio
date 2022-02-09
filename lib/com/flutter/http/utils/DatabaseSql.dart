@@ -1,3 +1,4 @@
+import 'package:flutter_dio_module/com/flutter/http/utils/MD5Utils.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -34,22 +35,23 @@ class DatabaseSql {
   static delDB() async {
     createDatabase().then((path) => {deleteDatabase(path)});
   }
-  
+
   //删除表
-  static Future clearData(Database db) async{
-    await database.rawQuery('SELECT * FROM $dbTableName limit 1').then((list) => {
-      closeDb(db, list)
-    });
+  static Future clearData(Database db) async {
+    await database
+        .rawQuery('SELECT * FROM $dbTableName limit 1')
+        .then((list) => {closeDb(db, list)});
   }
 
   //删除表并关闭数据库
-  static Set<Map<String ,dynamic>> closeDb(Database db,List<Map<String ,dynamic>> list){
-    if(list != null && list.length >0){
+  static Set<Map<String, dynamic>> closeDb(
+      Database db, List<Map<String, dynamic>> list) {
+    if (list != null && list.length > 0) {
       db.execute('DROP TABLE $dbTableName');
       db.close();
       deleteDatabase(db.path);
     }
-    return new Set<Map<String ,dynamic>> ();
+    return new Set<Map<String, dynamic>>();
   }
 
   //打开数据库
@@ -116,7 +118,8 @@ class DatabaseSql {
   /*
    * 删除
    */
-  static Future<int> deleteHttpCache(Database? database, String cacheKey) async {
+  static Future<int> deleteHttpCache(
+      Database? database, String cacheKey) async {
     return await database!.rawDelete(
         'DELETE FROM $dbTableName WHERE name = \'' + cacheKey + '\'');
   }

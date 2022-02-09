@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
-import 'package:rxdart/rxdart.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
 ///typedef就是给Function取个别名，如
@@ -36,9 +34,8 @@ class RxDio<T> {
     return data as T;
   };
 
-
   //初始化缓存数据库
-  void initDb(){
+  void initDb() {
     CacheManagers.init();
   }
 
@@ -62,9 +59,7 @@ class RxDio<T> {
     this.jsonTransformation = jsonTransformation;
   }
 
-
   RxDio() : super();
-
 
   //网络请求以及数据流程控制
   void call(CallBack<T>? callBack) {
@@ -77,21 +72,31 @@ class RxDio<T> {
     switch (cacheMode) {
       case CacheMode.NO_CACHE:
         //默认没有缓存
-        NetworkManager.request(url, params: params, method: httpMethod).then((response) {
-          controller.add(new RequestData(RequestType.NETWORK, jsonTransformation(response.data)));
+        NetworkManager.request(url, params: params, method: httpMethod)
+            .then((response) {
+          controller.add(new RequestData(
+              RequestType.NETWORK, jsonTransformation(response.data)));
         });
         break;
       case CacheMode.REQUEST_FAILED_READ_CACHE:
         //先获取网络,在获取缓存
-        NetworkManager.request(url, params: params, method: httpMethod).then((response) {
+        NetworkManager.request(url, params: params, method: httpMethod)
+            .then((response) {
           if (response == 200) {
-            controller.add(new RequestData(RequestType.NETWORK, jsonTransformation(response.data)));
+            controller.add(new RequestData(
+                RequestType.NETWORK, jsonTransformation(response.data)));
           } else {
             CacheManagers.getCache(url, params).then((list) => {
-                  if (list != null && list.length > 0){
-                      controller.add(new RequestData(RequestType.CACHE, jsonTransformation(list[0]['value'])))
-                  } else {
-                      controller.add(new RequestData(RequestType.CACHE, jsonTransformation(null), statusCode: 400))
+                  if (list != null && list.length > 0)
+                    {
+                      controller.add(new RequestData(RequestType.CACHE,
+                          jsonTransformation(list[0]['value'])))
+                    }
+                  else
+                    {
+                      controller.add(new RequestData(
+                          RequestType.CACHE, jsonTransformation(null),
+                          statusCode: 400))
                     }
                 });
           }
@@ -100,42 +105,52 @@ class RxDio<T> {
       case CacheMode.FIRST_CACHE_THEN_REQUEST:
         //先获取缓存,在获取网络数据
         CacheManagers.getCache(url, params).then((list) => {
-              if (list != null && list.length > 0){
-                  controller.add(new RequestData(RequestType.CACHE, jsonTransformation(list[0]['value'])))
-                } else {
-                  controller.add(new RequestData(RequestType.CACHE, jsonTransformation(null), statusCode: 400))
+              if (list != null && list.length > 0)
+                {
+                  controller.add(new RequestData(
+                      RequestType.CACHE, jsonTransformation(list[0]['value'])))
+                }
+              else
+                {
+                  controller.add(new RequestData(
+                      RequestType.CACHE, jsonTransformation(null),
+                      statusCode: 400))
                 }
             });
-        NetworkManager.request(url, params: params, method: httpMethod).then((response) {
-          controller.add(new RequestData(RequestType.NETWORK, jsonTransformation(response.data)));
+        NetworkManager.request(url, params: params, method: httpMethod)
+            .then((response) {
+          controller.add(new RequestData(
+              RequestType.NETWORK, jsonTransformation(response.data)));
         });
         break;
       case CacheMode.DEFAULT:
-      //默认没有缓存
-        NetworkManager.request(url, params: params, method: httpMethod).then((response) {
-          controller.add(new RequestData(RequestType.NETWORK, jsonTransformation(response.data)));
+        //默认没有缓存
+        NetworkManager.request(url, params: params, method: httpMethod)
+            .then((response) {
+          controller.add(new RequestData(
+              RequestType.NETWORK, jsonTransformation(response.data)));
         });
         break;
     }
 
     //使用观察这模式观察数据流
-    Observable(controller.stream).listen((requestData) {
+    controller.stream.listen((requestData) {
       switch (requestData.requestType) {
         case RequestType.NETWORK:
-        //网络数据
-          if(callBack!=null){
+          //网络数据
+          if (callBack != null) {
             callBack.onNetFinish!(requestData.data);
           }
           break;
         case RequestType.CACHE:
-        //缓存数据
-          if (callBack!=null&&callBack.onCacheFinish != null) {
+          //缓存数据
+          if (callBack != null && callBack.onCacheFinish != null) {
             callBack.onCacheFinish!(requestData.data);
           }
           break;
         case RequestType.UNKOWN:
-        //其他来源
-          if(callBack!=null&&callBack.onUnkownFinish!=null){
+          //其他来源
+          if (callBack != null && callBack.onUnkownFinish != null) {
             callBack.onUnkownFinish!(requestData.data);
           }
           break;
