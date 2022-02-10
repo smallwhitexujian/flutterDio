@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dio_module/com/app,data/Constants.dart';
-import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
-import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
-import 'com/flutter/http/adapter/Method.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -59,22 +54,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
-  void test() {
-    RxDio<WanbeanEntity>()
-      ..setUrl(Constants.config)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
-      ..setRequestMethod(Method.Get)
-      ..call(CallBack(onNetFinish: (data, type) {
-        print("type${type} , ++++data+${data}");
-      }));
-    // //观察着模式
-    // ApiService()
-    //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
-    //     .listen((data) {
-    //   print("Stream 流结果： " + data.datas.toString());
-    // });
-  }
+  // void test() {
+  //   RxDio<WanbeanEntity>()
+  //     ..setUrl(Constants.config)
+  //     ..setParams(null)
+  //     ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
+  //     ..setRequestMethod(Method.Get)
+  //     ..call(CallBack(onNetFinish: (data, type) {
+  //     }));
+  //   // //观察着模式
+  //   // ApiService()
+  //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+  //   //     .listen((data) {
+  //   //   print("Stream 流结果： " + data.datas.toString());
+  //   // });
+  // }
 
   void _incrementCounter() {
     setState(() {
@@ -85,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
     });
 
-    test();
+    // test();
   }
 
   @override

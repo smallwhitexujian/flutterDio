@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
