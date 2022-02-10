@@ -25,7 +25,7 @@ https://www.jianshu.com/p/dd0b0f3b6065
 
 使用方法
 
-```java
+```dart
     /*先将字符串转成json*/
     Map<String, dynamic> json = jsonDecode(jsonData);
     /*将Json转成实体类*/
@@ -44,7 +44,7 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
 
 ### RxDio模式解析 此方式不建议使用复用较困难
 
-```java
+```dart
     //RX dio模式请求网络
     RxDio<BaseBean<ConfigBeanEntity>>()
       ..setUrl(Constants.CONFIG)
@@ -68,7 +68,7 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
 
 ### 观察者模式 泛型解析
 
-```
+```dart
 //Stream支持,默认多订阅模式 Stream.asBroadcastStream()可以将一个单订阅模式的 Stream 转换成一个多订阅模式的 Stream isBroadcast 属性可以判断当前 Stream 所处的模式
 //assert(stream.isBroadcast == false);
 //stream.first.then(print);
