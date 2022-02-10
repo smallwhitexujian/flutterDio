@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
-import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
+import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
+import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
@@ -73,28 +75,22 @@ class RxDio<T> {
       case CacheMode.DEFAULT:
       case CacheMode.NO_CACHE:
         //默认没有缓存
-        NetworkManager.instance
-            .request(url, params: params, method: httpMethod)
-            .then((response) {
-          controller.add(new RequestData(
-              RequestType.NETWORK, jsonTransformation(response.data)));
+        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
+          controller.add(new RequestData(RequestType.NETWORK, data));
         });
         break;
       case CacheMode.REQUEST_FAILED_READ_CACHE:
         //先获取网络,在获取缓存
-        NetworkManager.instance
-            .request(url, params: params, method: httpMethod)
-            .then((response) {
-          //网络获取成功的时候使用网络，网络不成功的时候使用缓存
-          if (response == 200) {
-            controller.add(new RequestData(
-                RequestType.NETWORK, jsonTransformation(response.data)));
+        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
+          if (data.runtimeType == T) {
+            controller.add(new RequestData(RequestType.NETWORK, data));
           } else {
             CacheManagers.getCache(url, params).listen((event) {
               if (event.isNotEmpty) {
                 //存在缓存返回缓存
-                controller.add(new RequestData(
-                    RequestType.CACHE, jsonTransformation(event)));
+                Map<String, dynamic> jsonData = json.decode(event);
+                BaseBean bean = BaseBean<T>.fromJson(jsonData);
+                controller.add(new RequestData(RequestType.CACHE, bean.data));
               } else {
                 //不存在缓存返回错误
                 controller.add(RequestData(
@@ -110,40 +106,21 @@ class RxDio<T> {
         CacheManagers.getCache(url, params).listen((event) {
           if (event.isNotEmpty) {
             //存在缓存返回缓存
-            controller.add(
-                new RequestData(RequestType.CACHE, jsonTransformation(event)));
+            Map<String, dynamic> jsonData = json.decode(event);
+            BaseBean bean = BaseBean<T>.fromJson(jsonData);
+            controller.add(new RequestData(RequestType.CACHE, bean.data));
           }
         });
-        NetworkManager.instance
-            .request(url, params: params, method: httpMethod)
-            .then((response) {
-          controller.add(new RequestData(
-              RequestType.NETWORK, jsonTransformation(response.data)));
+        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
+          controller.add(new RequestData(RequestType.NETWORK, data));
         });
         break;
     }
 
     //使用观察这模式观察数据流
     controller.stream.listen((requestData) {
-      switch (requestData.requestType) {
-        case RequestType.NETWORK:
-          //网络数据
-          if (callBack != null) {
-            callBack.onNetFinish!(requestData.data);
-          }
-          break;
-        case RequestType.CACHE:
-          //缓存数据
-          if (callBack != null && callBack.onCacheFinish != null) {
-            callBack.onCacheFinish!(requestData.data);
-          }
-          break;
-        case RequestType.UNKOWN:
-          //其他来源
-          if (callBack != null && callBack.onUnkownFinish != null) {
-            callBack.onUnkownFinish!(requestData.data);
-          }
-          break;
+      if (callBack != null) {
+        callBack.onNetFinish!(requestData.data, requestData.requestType);
       }
     });
   }

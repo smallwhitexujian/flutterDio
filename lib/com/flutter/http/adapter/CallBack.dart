@@ -1,24 +1,20 @@
-typedef NetCallbackFunction<T> = void Function(T);
+typedef NetCallbackFunction<T> = void Function(T, RequestType);
 
 ///回调
 class CallBack<T> {
   NetCallbackFunction<T>? onNetFinish;
 
-  NetCallbackFunction<T>? onCacheFinish;
-
-  NetCallbackFunction<T>? onUnkownFinish;
-
-  CallBack({this.onNetFinish, this.onUnkownFinish, this.onCacheFinish});
+  CallBack({this.onNetFinish});
 }
 
 ///构造一个请求数据模型，
 class RequestData<T> {
   late RequestType requestType;
   late int? statusCode;
-  late T data ;
+  late T data;
 
   //创建请求对象
-  RequestData(RequestType requestType,T data, {int? statusCode}) {
+  RequestData(RequestType requestType, T data, {int? statusCode}) {
     this.requestType = requestType;
     this.statusCode = statusCode;
     this.data = data;

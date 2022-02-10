@@ -41,15 +41,8 @@ class NetworkManager {
     return _instance!;
   }
 
-  //flutter 重载并非重载而是可选参数或者参数默认值
-  Future<T> request<T>(String url,
-      {Method method = Method.Post,
-      CacheMode cacheMode = CacheMode.DEFAULT,
-      Map<String, dynamic>? params,
-      Function(T? t)? onSuccess,
-      Function(String error)? onError,
-      Interceptor? interceptor}) async {
-    // 创建全局的拦截器(默认拦截器)
+  // 创建全局的拦截器(默认拦截器)
+  void setInterceptors(Interceptor? interceptor) {
     List<Interceptor> interceptors = List.empty();
     if (interceptor != null) {
       //将自定义拦截器加入
@@ -57,7 +50,11 @@ class NetworkManager {
     }
     // 统一添加到拦截区中
     NetworkManager.instance.dio.interceptors.addAll(interceptors);
-    print("自定义拦截器的长度" + interceptors.length.toString());
+  }
+
+  //flutter 重载并非重载而是可选参数或者参数默认值
+  Future<T> request<T>(String url,
+      {Method method = Method.Post, Map<String, dynamic>? params}) async {
     // 返回结果，String类型
     Response<String> response;
     try {
@@ -81,19 +78,14 @@ class NetworkManager {
       }
       //这里判断是网络状态，并不是业务状态
       if (response.statusCode == 200) {
-        print(response.toString());
-        print(response.data.toString());
         Map<String, dynamic> data = json.decode(response.toString());
         BaseBean bean = BaseBean<T>.fromJson(data);
-        if (bean.isSuccess() && onSuccess != null) {
+        if (bean.isSuccess()) {
           /// 返回泛型Bean
-          await onSuccess(bean.data);
+          return await bean.data as T;
         } else {
-          if (onError != null) {
-            await onError(bean.message);
-          }
+          return await Future.error(bean.message);
         }
-        return bean.data as T;
       } else {
         return await Future.error(
             "服务器错误${response.statusCode},message${response.statusMessage}");
