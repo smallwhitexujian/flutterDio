@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
@@ -24,7 +25,15 @@ class MD5Utils {
   * Base64解密
   */
   static String decodeBase64(String data) {
-    return String.fromCharCodes(base64Decode(data));
+    // 网上找的很多都是String.fromCharCodes，这个中文会乱码
+    //String txt1 = String.fromCharCodes(bytes);
+    // var str = String.fromCharCodes(base64Decode(data));
+    if (data.isNotEmpty) {
+      Uint8List base64deBody = base64Decode(data);
+      return Utf8Decoder().convert(base64deBody);
+    } else {
+      return "";
+    }
   }
 
   /*

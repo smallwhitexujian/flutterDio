@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 
 import 'DatabaseSql.dart';
@@ -27,33 +29,41 @@ class CacheManagers {
     return cacheKey;
   }
 
-  //获取缓存
-  static Future<List<Map<String, dynamic>>> getCache(
-      String? path, Map<String, dynamic>? params) async {
-    return DatabaseSql.queryHttp(
-        DatabaseSql.database, getCacheKayFromPath(path, params));
+  //获取缓存 查询单条数据 Stream
+  static Stream<String> getCache(String? path, Map<String, dynamic>? params) {
+    var transformer = StreamTransformer<String, String>.fromHandlers(
+        handleData: (data, sink) {
+      sink.add(MD5Utils.decodeBase64(data.toString()));
+    });
+    return Stream.fromFuture(DatabaseSql.queryHttp(
+            DatabaseSql.database, getCacheKayFromPath(path, params)))
+        .asBroadcastStream()
+        .transform(transformer);
   }
 
   //保存缓存
   static saveCache(
       String path, Map<String, dynamic>? params, String value) async {
-    DatabaseSql.queryHttp(
+    await DatabaseSql.queryHttp(
             DatabaseSql.database, getCacheKayFromPath(path, params))
-        .then((list) {
-      if (list.length > 0) {
-        DatabaseSql.updateHttp(
+        .then((sqData) async {
+      if (sqData.isNotEmpty) {
+        value = MD5Utils.encodeBase64(value);
+        await DatabaseSql.updateHttp(
             DatabaseSql.database, getCacheKayFromPath(path, params), value);
       } else {
-        DatabaseSql.insertHttp(
-            DatabaseSql.database, getCacheKayFromPath(path, params), value);
+        if (value.isNotEmpty) {
+          value = MD5Utils.encodeBase64(value);
+          await DatabaseSql.insertHttp(
+              DatabaseSql.database, getCacheKayFromPath(path, params), value);
+        }
       }
     });
   }
 
   //清楚缓存数据,删除表
   static clearCache() async {
-    // await Future.delayed(const Duration(seconds:1));
-    DatabaseSql.clearData(DatabaseSql.database)
+    await DatabaseSql.clearData(DatabaseSql.database)
         .then((value) => {DatabaseSql.initDatabase()});
   }
 
@@ -64,12 +74,17 @@ class CacheManagers {
     InterceptorsWrapper interceptorsWrapper = InterceptorsWrapper(
         onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
       path = options.path;
-      map = options.queryParameters;
+      if (map != null && map!.isNotEmpty) {
+        //没有param的时候是一个空的对象
+        map = options.queryParameters;
+      } else {
+        map = null;
+      }
       return handler.next(options);
     }, onError: (DioError e, ErrorInterceptorHandler handler) {
       return handler.next(e);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) {
-      // saveCache(path, map, response.data);
+      saveCache(path, map, response.data);
       return handler.next(response);
     });
     return interceptorsWrapper;

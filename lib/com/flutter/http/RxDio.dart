@@ -70,9 +70,11 @@ class RxDio<T> {
 
     //判断缓存模型没有缓存
     switch (cacheMode) {
+      case CacheMode.DEFAULT:
       case CacheMode.NO_CACHE:
         //默认没有缓存
-        NetworkManager.request(url, params: params, method: httpMethod)
+        NetworkManager.instance
+            .request(url, params: params, method: httpMethod)
             .then((response) {
           controller.add(new RequestData(
               RequestType.NETWORK, jsonTransformation(response.data)));
@@ -80,52 +82,40 @@ class RxDio<T> {
         break;
       case CacheMode.REQUEST_FAILED_READ_CACHE:
         //先获取网络,在获取缓存
-        NetworkManager.request(url, params: params, method: httpMethod)
+        NetworkManager.instance
+            .request(url, params: params, method: httpMethod)
             .then((response) {
+          //网络获取成功的时候使用网络，网络不成功的时候使用缓存
           if (response == 200) {
             controller.add(new RequestData(
                 RequestType.NETWORK, jsonTransformation(response.data)));
           } else {
-            CacheManagers.getCache(url, params).then((list) => {
-                  if (list.length > 0)
-                    {
-                      controller.add(new RequestData(RequestType.CACHE,
-                          jsonTransformation(list[0]['value'])))
-                    }
-                  else
-                    {
-                      controller.add(new RequestData(
-                          RequestType.CACHE, jsonTransformation(null),
-                          statusCode: 400))
-                    }
-                });
+            CacheManagers.getCache(url, params).listen((event) {
+              if (event.isNotEmpty) {
+                //存在缓存返回缓存
+                controller.add(new RequestData(
+                    RequestType.CACHE, jsonTransformation(event)));
+              } else {
+                //不存在缓存返回错误
+                controller.add(RequestData(
+                    RequestType.CACHE, jsonTransformation(null),
+                    statusCode: 400));
+              }
+            });
           }
         });
         break;
       case CacheMode.FIRST_CACHE_THEN_REQUEST:
         //先获取缓存,在获取网络数据
-        CacheManagers.getCache(url, params).then((list) => {
-              if (list.length > 0)
-                {
-                  controller.add(new RequestData(
-                      RequestType.CACHE, jsonTransformation(list[0]['value'])))
-                }
-              else
-                {
-                  controller.add(new RequestData(
-                      RequestType.CACHE, jsonTransformation(null),
-                      statusCode: 400))
-                }
-            });
-        NetworkManager.request(url, params: params, method: httpMethod)
-            .then((response) {
-          controller.add(new RequestData(
-              RequestType.NETWORK, jsonTransformation(response.data)));
+        CacheManagers.getCache(url, params).listen((event) {
+          if (event.isNotEmpty) {
+            //存在缓存返回缓存
+            controller.add(
+                new RequestData(RequestType.CACHE, jsonTransformation(event)));
+          }
         });
-        break;
-      case CacheMode.DEFAULT:
-        //默认没有缓存
-        NetworkManager.request(url, params: params, method: httpMethod)
+        NetworkManager.instance
+            .request(url, params: params, method: httpMethod)
             .then((response) {
           controller.add(new RequestData(
               RequestType.NETWORK, jsonTransformation(response.data)));

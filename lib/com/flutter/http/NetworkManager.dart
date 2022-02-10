@@ -42,7 +42,7 @@ class NetworkManager {
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
-  static Future<T> request<T>(String url,
+  Future<T> request<T>(String url,
       {Method method = Method.Post,
       CacheMode cacheMode = CacheMode.DEFAULT,
       Map<String, dynamic>? params,
@@ -57,6 +57,7 @@ class NetworkManager {
     }
     // 统一添加到拦截区中
     NetworkManager.instance.dio.interceptors.addAll(interceptors);
+    print("自定义拦截器的长度" + interceptors.length.toString());
     // 返回结果，String类型
     Response<String> response;
     try {

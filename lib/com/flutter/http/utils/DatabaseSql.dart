@@ -75,9 +75,26 @@ class DatabaseSql {
   }
 
   /*
+   * 查询 单条数据
+   */
+  static Future<String> queryHttp(Database database, String cacheKey) async {
+    return await database
+        .rawQuery('SELECT value FROM $dbTableName WHERE cacheKey = \'' +
+            cacheKey +
+            "\'")
+        .then((value) {
+      if (value.length > 0) {
+        return value.first.values.first.toString();
+      } else {
+        return "";
+      }
+    });
+  }
+
+  /*
    * 查询
    */
-  static Future<List<Map<String, dynamic>>> queryHttp(
+  static Future<List<Map<String, dynamic>>> queryAll(
       Database database, String cacheKey) async {
     return await database.rawQuery(
         'SELECT value FROM $dbTableName WHERE cacheKey = \'' + cacheKey + "\'");

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/app,data/Constants.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'com/app,data/wanbean_entity.dart';
 import 'com/flutter/http/adapter/Method.dart';
 
@@ -61,14 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void test() {
     //观察着模式
     ApiService()
-        .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+        .getResponse<WanbeanEntity>(Constants.config, null, Method.Get,
+            cacheMode: CacheMode.REQUEST_FAILED_READ_CACHE)
         .listen((data) {
       print("Stream 流结果： " + data.datas.toString());
     });
-
-    ApiService()
-        .getFutureResponse<WanbeanEntity>(Constants.config, null, Method.Get)
-        .then((value) => {print("Future 结果： " + value.toString())});
   }
 
   void _incrementCounter() {
