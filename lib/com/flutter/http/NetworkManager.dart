@@ -27,9 +27,8 @@ class NetworkManager {
           sendTimeout: 10000,
           headers: {"Content-Type": "application/json"})
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor())
+      ..interceptors.add(HttpLogInterceptor(false))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
-    // ..interceptors.add(HttpLogInterceptor(GlobalConfig.isDebug))
     // ..interceptors.add(ErrorInterceptor())
   }
 

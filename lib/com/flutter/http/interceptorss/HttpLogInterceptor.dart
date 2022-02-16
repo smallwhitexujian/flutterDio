@@ -2,6 +2,11 @@ import 'package:dio/dio.dart';
 
 //网络日志拦截
 class HttpLogInterceptor extends Interceptor {
+  var isDebug = true;
+  HttpLogInterceptor(bool debug) {
+    this.isDebug = debug;
+  }
+
   @override
   Future onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
@@ -17,7 +22,10 @@ class HttpLogInterceptor extends Interceptor {
       else
         requestStr += "- BODY:\n${data.toString()}\n";
     }
-    print(requestStr);
+
+    if (isDebug) {
+      print(requestStr);
+    }
     return super.onRequest(options, handler);
   }
 
@@ -35,7 +43,9 @@ class HttpLogInterceptor extends Interceptor {
       errorStr += "- ERRORTYPE: ${err.type}\n";
       errorStr += "- MSG: ${err.message}\n";
     }
-    print(errorStr);
+    if (isDebug) {
+      print(errorStr);
+    }
     return super.onError(err, handler);
   }
 
@@ -54,7 +64,9 @@ class HttpLogInterceptor extends Interceptor {
     if (response.data != null) {
       responseStr += "- BODY:\n ${_parseResponse(response)}";
     }
-    // printWrapped(responseStr);
+    if (isDebug) {
+      printWrapped(responseStr);
+    }
     return super.onResponse(response, handler);
   }
 
@@ -72,7 +84,6 @@ class HttpLogInterceptor extends Interceptor {
       responseStr += data.listToStructureString();
     else
       responseStr += response.data.toString();
-
     return responseStr;
   }
 }

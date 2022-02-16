@@ -3,9 +3,7 @@ import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
-//初始类
 class Global {
-  //初始化方法全部存储在这里
   static Future init() async {
     return RxDio().initDb();
   }
@@ -62,11 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
   //     ..setRequestMethod(Method.Get)
   //     ..call(CallBack(onNetFinish: (data, type) {
   //     }));
-  //   // //观察着模式
+  //   //
   //   // ApiService()
   //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
   //   //     .listen((data) {
-  //   //   print("Stream 流结果： " + data.datas.toString());
+  //   //   print("Stream  " + data.datas.toString());
   //   // });
   // }
 
