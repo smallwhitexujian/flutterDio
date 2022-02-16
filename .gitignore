@@ -43,6 +43,7 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 lib/com/flutter/http/NetworkManager.dart
+.android/
 .android/*
 .android/local.properties
 .android/.gradle/6.7/gc.properties
