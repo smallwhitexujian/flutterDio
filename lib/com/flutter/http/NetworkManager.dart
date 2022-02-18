@@ -27,9 +27,8 @@ class NetworkManager {
           sendTimeout: 10000,
           headers: {"Content-Type": "application/json"})
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor(false))
+      ..interceptors.add(HttpLogInterceptor(true))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
-    // ..interceptors.add(ErrorInterceptor())
   }
 
   static NetworkManager _getInstance() {
@@ -47,31 +46,37 @@ class NetworkManager {
       interceptors.add(interceptor);
     }
     // 统一添加到拦截区中
-    NetworkManager.instance.dio.interceptors.addAll(interceptors);
+    dio.interceptors.addAll(interceptors);
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
   Future<T> request<T>(String url,
-      {Method method = Method.Post, Map<String, dynamic>? params}) async {
+      {String host = "",
+      Method method = Method.Post,
+      Map<String, dynamic>? params}) async {
+    //对请求域名做切换
+    if (host.isEmpty) {
+      //域名为空的时候获取配置接口
+      dio.options.baseUrl = Constants.baseUrl;
+    } else {
+      //域名有值则直接获取域名
+      dio.options.baseUrl = host;
+    }
     // 返回结果，String类型
     Response<String> response;
     try {
       switch (method) {
         case Method.Post:
-          response = await NetworkManager.instance.dio
-              .post(url, queryParameters: params);
+          response = await dio.post(url, queryParameters: params);
           break;
         case Method.Get:
-          response = await NetworkManager.instance.dio
-              .get(url, queryParameters: params);
+          response = await dio.get(url, queryParameters: params);
           break;
         case Method.Delete:
-          response = await NetworkManager.instance.dio
-              .delete(url, queryParameters: params);
+          response = await dio.delete(url, queryParameters: params);
           break;
         case Method.Put:
-          response = await NetworkManager.instance.dio
-              .put(url, queryParameters: params);
+          response = await dio.put(url, queryParameters: params);
           break;
       }
       //这里判断是网络状态，并不是业务状态
@@ -89,7 +94,7 @@ class NetworkManager {
             "服务器错误${response.statusCode},message${response.statusMessage}");
       }
     } on DioError catch (error) {
-      return Future.error(error);
+      return await Future.error(error);
     }
   }
 }

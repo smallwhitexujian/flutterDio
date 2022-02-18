@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dio_module/com/app,data/Constants.dart';
+import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
+import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -52,21 +56,39 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
-  // void test() {
-  //   RxDio<WanbeanEntity>()
-  //     ..setUrl(Constants.config)
-  //     ..setParams(null)
-  //     ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
-  //     ..setRequestMethod(Method.Get)
-  //     ..call(CallBack(onNetFinish: (data, type) {
-  //     }));
-  //   //
-  //   // ApiService()
-  //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
-  //   //     .listen((data) {
-  //   //   print("Stream  " + data.datas.toString());
-  //   // });
-  // }
+  void test() {
+    RxDio<WanbeanEntity>()
+      ..setUrl(Constants.config)
+      ..setParams(null)
+      ..setCacheMode(CacheMode.DEFAULT)
+      ..setRequestMethod(Method.Get)
+      ..setTransFrom((p0) {
+        print("======>" + p0?.datas[0].content);
+        return p0;
+      })
+      ..call(CallBack(onNetFinish: (data) {
+        print("asadsadasd---> ${data?.error}");
+        print("asadsadasd---> ${data?.statusCode}");
+        print("asadsadasd---> ${data?.responseType}");
+        print("asadsadasd---> ${data?.data?.datas.first.content}");
+      }));
+
+    // RxDio<WanbeanEntity>()
+    //   ..setUrl(Constants.config)
+    //   ..setParams(null)
+    //   ..setCacheMode(CacheMode.DEFAULT)
+    //   ..setRequestMethod(Method.Get)
+    //   ..call(CallBack(onNetFinish: (data, type) {
+    //     print("asadsadasd---> ${data?.statusCode}");
+    //     print("asadsadasd---> ${data?.data?.datas.first.content}");
+    //   }));
+    //   //
+    //   // ApiService()
+    //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
+    //   //     .listen((data) {
+    //   //   print("Stream  " + data.datas.toString());
+    //   // });
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -77,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
     });
 
-    // test();
+    test();
   }
 
   @override

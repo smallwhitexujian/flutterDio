@@ -42,27 +42,23 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
 
 ## 网络请求使用方法
 
-### RxDio模式解析 此方式不建议使用复用较困难
+### RxDio模式解析 
 
 ```dart
     //RX dio模式请求网络
-    RxDio<BaseBean<ConfigBeanEntity>>()
-      ..setUrl(Constants.CONFIG)
-      ..setRequestMethod(Method.Get)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)
-      ..setJsonTransFrom((data) {
-        if (data != null) {
-          Map<String, dynamic> map = json.decode(data);
-          return BaseBean<ConfigBeanEntity>.fromJson(map);
-        }
-        return BaseBean<ConfigBeanEntity>.fromJson(new Map());
+    RxDio<WanbeanEntity>() //泛型解析
+      ..setUrl(Constants.config) //请求地址
+      ..setParams(null)//params map
+      ..setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE)//缓存模型
+      ..setRequestMethod(Method.Get)//请求方式
+      ..setTransFrom((p0) {//数据拦截过滤处理，如果有Transformer则先执行Transformer后在执行callBack。
+        //只有当结果正常的时候返回正常结果，如果结果错误或者null的时候这里不会触发
+          print("======>" + p0.datas[0].content);
+          return p0;
       })
-      ..call(new CallBack(onNetFinish: (data) {
-        print("网络请求返回数据：" + data.data!.gurl);
-      },
-      onCacheFinish: (data){
-        print("缓存数据返回：" + data.data!.gurl);
+      //call返回 transformer后的对象,如果不处理则直接返回完整对象
+      ..call(CallBack(onNetFinish: (data, type) {//返回data， type 对于缓存模型   
+        print("asadsadasd---> ${}"+ ss.);
       }));
 ```
 

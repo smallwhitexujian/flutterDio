@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter_dio_module/com/app,data/Constants.dart';
 import 'package:flutter_dio_module/com/flutter/http/ApiService.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
@@ -9,7 +11,7 @@ import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
 ///typedef就是给Function取个别名，如
-typedef JsonTransformation<T> = T Function(String?);
+typedef Transformation<T> = T? Function(dynamic);
 
 ///Rx + dio 网络请求
 class RxDio<T> {
@@ -22,6 +24,9 @@ class RxDio<T> {
   //请求接口地址
   late String url;
 
+  //请求域名
+  String host = "";
+
   //参数配置
   late Map<String, dynamic>? params;
 
@@ -29,11 +34,11 @@ class RxDio<T> {
   CacheMode cacheMode = CacheMode.NO_CACHE;
 
   //json解析
-  JsonTransformation<T> jsonTransformation = (data) {
+  Transformation<T> transformation = (data) {
     if (data == null) {
-      throw Exception("data is not null");
+      return null;
     }
-    return data as T;
+    return data;
   };
 
   //初始化缓存数据库
@@ -49,6 +54,10 @@ class RxDio<T> {
     this.url = url;
   }
 
+  void setHost(String host) {
+    this.host = host;
+  }
+
   void setParams(Map<String, dynamic>? params) {
     this.params = params;
   }
@@ -57,71 +66,115 @@ class RxDio<T> {
     this.cacheMode = cacheMode;
   }
 
-  void setJsonTransFrom(JsonTransformation<T> jsonTransformation) {
-    this.jsonTransformation = jsonTransformation;
+  //可以对数据流进行处理,比如包装一层或者修改其中数值等操作
+  void setTransFrom(Transformation<T> transformation) {
+    this.transformation = transformation;
   }
 
   RxDio() : super();
 
   //网络请求以及数据流程控制
-  void call(CallBack<T>? callBack) {
-    //创建创建数据流控制对象,
-    // ignore: close_sinks
-    StreamController<RequestData<T>> controller =
-        new StreamController<RequestData<T>>();
-
+  void call(CallBack<T>? callBack) async {
+    //创建Stream监听,使用Controller的时候一定要close 否者会报错
+    StreamController<ResponseData<T>> controller =
+        new StreamController<ResponseData<T>>();
+    //网络条件判断
+    var connectivityResult = await (Connectivity().checkConnectivity());
     //判断缓存模型没有缓存
     switch (cacheMode) {
       case CacheMode.DEFAULT:
       case CacheMode.NO_CACHE:
         //默认没有缓存
-        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
-          controller.add(new RequestData(RequestType.NETWORK, data));
+        ApiService().getResponse<T>(url, params, httpMethod, host: host).listen(
+            (data) {
+          controller.add(new ResponseData(
+              ResponseType.NETWORK, transformation(data as T)));
+        }, onError: (error) {
+          controller.add(new ResponseData(ResponseType.ERROR, null,
+              error: error.toString(), statusCode: 500));
         });
         break;
       case CacheMode.REQUEST_FAILED_READ_CACHE:
-        //先获取网络,在获取缓存
-        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
-          if (data.runtimeType == T) {
-            controller.add(new RequestData(RequestType.NETWORK, data));
-          } else {
-            CacheManagers.getCache(url, params).listen((event) {
-              if (event.isNotEmpty) {
-                //存在缓存返回缓存
-                Map<String, dynamic> jsonData = json.decode(event);
-                BaseBean bean = BaseBean<T>.fromJson(jsonData);
-                controller.add(new RequestData(RequestType.CACHE, bean.data));
-              } else {
-                //不存在缓存返回错误
-                controller.add(RequestData(
-                    RequestType.CACHE, jsonTransformation(null),
-                    statusCode: 400));
-              }
-            });
-          }
-        });
+        //先获取网络,当网络不存在的时候获取缓存数据
+        if (connectivityResult == ConnectivityResult.mobile ||
+            connectivityResult == ConnectivityResult.wifi) {
+          ApiService()
+              .getResponse<T>(url, params, httpMethod, host: host)
+              .listen((data) {
+            if (data.runtimeType == T) {
+              controller.add(new ResponseData(
+                  ResponseType.NETWORK, transformation(data as T)));
+            }
+          }, onError: (error) {
+            controller.add(new ResponseData(ResponseType.ERROR, null,
+                error: error.toString(), statusCode: 500));
+          });
+        } else {
+          CacheManagers.getCache(url, params).listen((event) {
+            if (event.isNotEmpty) {
+              //存在缓存返回缓存
+              Map<String, dynamic> jsonData = json.decode(event);
+              BaseBean bean = BaseBean<T>.fromJson(jsonData);
+              controller.add(new ResponseData(
+                  ResponseType.CACHE, transformation(bean.data)));
+            } else {
+              //不存在缓存返回错误
+              controller.add(ResponseData(ResponseType.CACHE, null,
+                  error: Constants.error_01, statusCode: 400));
+            }
+          });
+        }
         break;
       case CacheMode.FIRST_CACHE_THEN_REQUEST:
-        //先获取缓存,在获取网络数据
-        CacheManagers.getCache(url, params).listen((event) {
-          if (event.isNotEmpty) {
-            //存在缓存返回缓存
-            Map<String, dynamic> jsonData = json.decode(event);
-            BaseBean bean = BaseBean<T>.fromJson(jsonData);
-            controller.add(new RequestData(RequestType.CACHE, bean.data));
-          }
-        });
-        ApiService().getResponse<T>(url, params, httpMethod).listen((data) {
-          controller.add(new RequestData(RequestType.NETWORK, data));
-        });
+        if (connectivityResult == ConnectivityResult.mobile ||
+            connectivityResult == ConnectivityResult.wifi) {
+          //先获取缓存,在获取网络数据
+          CacheManagers.getCache(url, params).listen((event) {
+            if (event.isNotEmpty) {
+              //存在缓存返回缓存
+              Map<String, dynamic> jsonData = json.decode(event);
+              BaseBean bean = BaseBean<T>.fromJson(jsonData);
+              controller.add(new ResponseData(
+                  ResponseType.CACHE, transformation(bean.data)));
+            }
+          });
+          ApiService()
+              .getResponse<T>(url, params, httpMethod, host: host)
+              .listen((data) {
+            controller.add(new ResponseData(
+                ResponseType.NETWORK, transformation(data as T)));
+          }, onError: (error) {
+            controller.add(new ResponseData(ResponseType.ERROR, null,
+                error: error.toString(), statusCode: 500));
+          });
+        } else {
+          //先获取缓存,在获取网络数据
+          CacheManagers.getCache(url, params).listen((event) {
+            if (event.isNotEmpty) {
+              //存在缓存返回缓存
+              Map<String, dynamic> jsonData = json.decode(event);
+              BaseBean bean = BaseBean<T>.fromJson(jsonData);
+              controller.add(new ResponseData(
+                  ResponseType.CACHE, transformation(bean.data)));
+            } else {
+              //不存在缓存返回错误
+              controller.add(ResponseData(ResponseType.CACHE, null,
+                  statusCode: 400, error: Constants.error_01));
+            }
+          }, onError: (error) {
+            controller.add(new ResponseData(ResponseType.ERROR, null,
+                error: error.toString(), statusCode: 500));
+          });
+        }
         break;
     }
 
     //使用观察这模式观察数据流
     controller.stream.listen((requestData) {
       if (callBack != null) {
-        callBack.onNetFinish!(requestData.data, requestData.requestType);
+        callBack.onNetFinish!(requestData);
       }
+      controller.close();
     });
   }
 }
