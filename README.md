@@ -42,6 +42,25 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
 
 ## 网络请求使用方法
 
+### RxDio初始化
+
+创建一个future来初始化项目中所需要的东西,
+
+`GlobalConfig`中可以设置请求的host,是否打印日志,是否使用缓存,设置拦截器
+
+```dart
+class Global {
+  static Future init() async {
+    return GlobalConfig.intstance
+      ..setDebugConfig(false)
+      ..setHost("https://wanandroid.com/")
+      ..setUserCacheConfig(true);
+  }
+}
+
+void main() => Global.init().then((e) => runApp(MyApp()));
+```
+
 ### RxDio模式解析 
 
 ```dart
@@ -62,13 +81,10 @@ https://blog.csdn.net/yuzhiqiang_1993/article/details/88533166
       }));
 ```
 
-### 观察者模式 泛型解析
+### 观察者模式 泛型解析 一下不支持缓存
 
 ```dart
 //Stream支持,默认多订阅模式 Stream.asBroadcastStream()可以将一个单订阅模式的 Stream 转换成一个多订阅模式的 Stream isBroadcast 属性可以判断当前 Stream 所处的模式
-//assert(stream.isBroadcast == false);
-//stream.first.then(print);
-//stream.last.then(print);// Bad state: Stream already has subscriber.
 
  ApiService()
         .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
