@@ -5,15 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Flutter",//启动方式
+            "type": "dart",//启动语言
+            "request": "launch",//请求动作
+            "program": "lib/example/main.dart"//启动路径
+        },
+        {
             "name": "flutter_dio_module",
             "request": "launch",
             "type": "dart"
-        },
-        {
-            "name": "flutter_dio_module (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
         }
     ]
 }

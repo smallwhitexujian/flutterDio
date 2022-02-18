@@ -1,35 +1,35 @@
-# 变更日志
-根据Dio封装网络情况库。[仓库地址](https://gitee.com/xjdd/flutter-rx-dio)
-1.简单封装dio,
-2.通过stream和future 实现数据流转以及监听
-3.通过抽象类实现json解析
+# change Log.
+Encapsulate the network condition library according to Dio. [warehouse address] (https://gitee.com/xjdd/flutter-rx-dio).
+1. Simple package dio.
+2. Data transfer and monitoring through stream and future.
+3. Implement json parsing through abstract classes.
 
-格式基于[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)，
-并且该项目遵循 [语义版本控制](https://semver.org/spec/v2.0.0.html)。
+The format is based on [Keep a Changelog] (https://keepachangelog.com/en/1.0.0/).
+And the project follows [semantic version Control] (https://semver.org/spec/v2.0.0.html).
 
-## [已发布]
+# # [released].
 
-## [1.0.0] - 2022-02-16
-＃＃＃ 添加
-- 首版本，基于[dio](https://github.com/flutterchina/dio)网络请求框架,进行二次封装.
+# # [1.0.0]-2022-02-16.
+# add.
+-the first version is based on [dio] (https://github.com/flutterchina/dio) network request framework) for secondary encapsulation.
 
-  dio是一个强大的Dart Http请求库，支持Restful API、FormData、拦截器、请求取消、Cookie管理、文件上传/下载、超时、自定义适配器等...
-- 通过Dart自带Steam或者future将dio网络请求部分进行二次包装,在结合sqlite将网络数据进行缓存起来方便读取,通过简单参数设定可以到网络数据
+Dio is a powerful Dart Http request library that supports Restful API, FormData, interceptor, request cancellation, Cookie management, file upload / download, timeout, custom adapters, etc.
+-the dio network request part is re-packaged by Dart with Steam or future, and the network data is cached in combination with sqlite for easy reading. The network data can be accessed through simple parameter settings.
 
-## [1.0.1] - 2022-02-18
-＃＃＃ 升级
-- 1.优化网络请的时候可以动态修改host地址根据业务情况自行修改
-- 2.`Transformations` 优化之前不能准确判断类型目前可以实现准确判断类型,`Transformations`使用具体如下:
+# # [1.0.1]-2022-02-18.
+# upgrade.
+- 1. When you optimize the network, you can dynamically modify the host address and modify it according to the business situation.
+- 2. `Transformations` cannot accurately determine the type before optimization. Currently, you can accurately determine the type. The usage of `Transformations` is as follows:
 ```dart 
       ..setTransFrom((streamData) {
         //TODO 这里StreamData返回是当前请求返回的对象,可以进行修改对象，返回一个修改后的对象
         return streamData;
       })
 ```
-- 3.RequestData调整,之前无法区分包装返回数据,导致`Transformations`会出现数据混乱的情况,调整后，增加error类型，增减数据来源`ResponseType`:ERROR,CACHE,UNKOWN,NETWORK分别从这个几个方面可以来源数据。
-- 4.调整网络缓存的逻辑，之前逻辑没有根据网络条件判断,目前增加网络条件判断.
-DEFAULT:默认走网络请求
-NO_CACHE:没有缓存直接网络请求
-REQUEST_FAILED_READ_CACHE:判断网络环境，先获取网络,当网络不行的时候在获取缓存.
-FIRST_CACHE_THEN_REQUEST:优先触发缓存数据同时在请求网络数据会触发刷新两次,如果缓存不存在直接触发网络数据.然后在网络拦截器里面进行拦截缓存到sqlite
-- 5.RxdioConfig配置初始化调整,默认开启缓存,默认关闭打印日志输出,增加拦截器配置
+- 3. RequestData adjustment. Previously, it is impossible to distinguish the returned data from packaging, resulting in data confusion in `Transformations`. After adjustment, add error type, add or decrease data source `ResponseType`: ERROR,CACHE,UNKOWN,NETWORK can source data from these aspects respectively.
+- 4. Adjust the logic of the network cache, the previous logic did not judge according to the network conditions, but now add the network condition judgment.
+DEFAULT: network request by default.
+NO_CACHE: direct network requests are not cached.
+REQUEST_FAILED_READ_CACHE: judge the network environment, get the network first, and get the cache when the network fails.
+FIRST_CACHE_THEN_REQUEST: trigger cache data first while requesting network data will trigger refresh twice, if cache does not exist, directly trigger network data. Then intercept the cache to sqlite in the network interceptor.
+- 5. RxdioConfig configuration initialization adjustment. Cache is enabled by default, print log output is turned off by default, and interceptor configuration is added.
