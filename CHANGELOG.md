@@ -32,4 +32,4 @@ DEFAULT:默认走网络请求
 NO_CACHE:没有缓存直接网络请求
 REQUEST_FAILED_READ_CACHE:判断网络环境，先获取网络,当网络不行的时候在获取缓存.
 FIRST_CACHE_THEN_REQUEST:优先触发缓存数据同时在请求网络数据会触发刷新两次,如果缓存不存在直接触发网络数据.然后在网络拦截器里面进行拦截缓存到sqlite
-- 5.RxdioConfig配置初始化调整,默认开启缓存,默认关闭打印日志输出,
+- 5.RxdioConfig配置初始化调整,默认开启缓存,默认关闭打印日志输出,增加拦截器配置

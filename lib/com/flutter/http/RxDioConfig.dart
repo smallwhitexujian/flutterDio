@@ -1,6 +1,9 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
+import 'package:flutter_dio_module/com/flutter/http/interface/BaseApplication.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 
-class GlobalConfig {
+class GlobalConfig extends BaseApplication {
   //是否是debug模式
   bool isDebug = false;
 
@@ -37,6 +40,21 @@ class GlobalConfig {
     this.isUserCache = isUserCache;
   }
 
+  /*
+   * @param interceptor 拦截器
+   */
+  void setInterceptor(Interceptor? interceptor) {
+    NetworkManager.instance.setInterceptor(interceptor);
+  }
+
+  /*
+   * @param interceptors 拦截器s
+   */
+  void setInterceptors(Interceptors interceptors) {
+    NetworkManager.instance.setInterceptors(interceptors);
+  }
+
+  @override
   init() {
     if (isUserCache) {
       CacheManagers.init(); //初始化缓存数据库

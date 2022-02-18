@@ -39,14 +39,26 @@ class NetworkManager {
   }
 
   // 创建全局的拦截器(默认拦截器)
-  void setInterceptors(Interceptor? interceptor) {
-    List<Interceptor> interceptors = List.empty();
-    if (interceptor != null) {
+  void setInterceptor(Interceptor? interceptor) {
+    List<Interceptor> interceptors = [];
+    bool isContainer = interceptors.contains(interceptor); //去重
+    if (interceptor != null && !isContainer) {
       //将自定义拦截器加入
       interceptors.add(interceptor);
     }
+    bool container = dio.interceptors.contains(interceptors); //去重
+    if (!container) {
+      dio.interceptors.addAll(interceptors);
+    }
+  }
+
+// 创建全局的拦截器(默认拦截器)
+  void setInterceptors(Interceptors interceptors) {
     // 统一添加到拦截区中
-    dio.interceptors.addAll(interceptors);
+    bool isContainer = dio.interceptors.contains(interceptors); //去重
+    if (!isContainer) {
+      dio.interceptors.addAll(interceptors);
+    }
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
