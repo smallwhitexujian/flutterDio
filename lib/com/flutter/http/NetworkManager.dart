@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'interceptorss/HttpLogInterceptor.dart';
-import '../../app,data/Constants.dart';
 
 ///单例模式
 class NetworkManager {
@@ -20,14 +20,14 @@ class NetworkManager {
     ///初始化
     dio = Dio()
       ..options = BaseOptions(
-          baseUrl: Constants.baseUrl,
+          baseUrl: GlobalConfig.intstance.baseUrl,
           connectTimeout: 10000,
           receiveTimeout: 1000 * 60 * 60 * 24,
           responseType: ResponseType.plain,
           sendTimeout: 10000,
           headers: {"Content-Type": "application/json"})
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor(true))
+      ..interceptors.add(HttpLogInterceptor(GlobalConfig.intstance.isDebug))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
   }
 
@@ -57,7 +57,7 @@ class NetworkManager {
     //对请求域名做切换
     if (host.isEmpty) {
       //域名为空的时候获取配置接口
-      dio.options.baseUrl = Constants.baseUrl;
+      dio.options.baseUrl = GlobalConfig.intstance.baseUrl;
     } else {
       //域名有值则直接获取域名
       dio.options.baseUrl = host;

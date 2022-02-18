@@ -4,12 +4,16 @@ import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
 class Global {
   static Future init() async {
-    return RxDio().initDb();
+    return GlobalConfig.intstance
+      ..setDebugConfig(false)
+      ..setHost("https://wanandroid.com/")
+      ..setUserCacheConfig(true);
   }
 }
 

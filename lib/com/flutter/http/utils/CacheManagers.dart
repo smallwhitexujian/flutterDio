@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 
 import 'DatabaseSql.dart';
 import 'MD5Utils.dart';
@@ -31,6 +32,10 @@ class CacheManagers {
 
   //获取缓存 查询单条数据 Stream
   static Stream<String> getCache(String? path, Map<String, dynamic>? params) {
+    if (!GlobalConfig.intstance.isUserCache) {
+      throw Exception("GlobalConfig isUserCache need ture!!!");
+    }
+
     var transformer = StreamTransformer<String, String>.fromHandlers(
         handleData: (data, sink) {
       sink.add(MD5Utils.decodeBase64(data.toString()));
@@ -84,7 +89,9 @@ class CacheManagers {
     }, onError: (DioError e, ErrorInterceptorHandler handler) {
       return handler.next(e);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) {
-      saveCache(path, map, response.data);
+      if (GlobalConfig.intstance.isUserCache) {
+        saveCache(path, map, response.data);
+      }
       return handler.next(response);
     });
     return interceptorsWrapper;

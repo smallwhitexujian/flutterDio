@@ -41,11 +41,6 @@ class RxDio<T> {
     return data;
   };
 
-  //初始化缓存数据库
-  void initDb() {
-    CacheManagers.init();
-  }
-
   void setRequestMethod(Method method) {
     this.httpMethod = method;
   }
@@ -91,7 +86,8 @@ class RxDio<T> {
               ResponseType.NETWORK, transformation(data as T)));
         }, onError: (error) {
           controller.add(new ResponseData(ResponseType.ERROR, null,
-              error: error.toString(), statusCode: 500));
+              error: error.toString(),
+              statusCode: Constants.responseCodeNetworkError));
         });
         break;
       case CacheMode.REQUEST_FAILED_READ_CACHE:
@@ -107,7 +103,8 @@ class RxDio<T> {
             }
           }, onError: (error) {
             controller.add(new ResponseData(ResponseType.ERROR, null,
-                error: error.toString(), statusCode: 500));
+                error: error.toString(),
+                statusCode: Constants.responseCodeNetworkError));
           });
         } else {
           CacheManagers.getCache(url, params).listen((event) {
@@ -120,7 +117,8 @@ class RxDio<T> {
             } else {
               //不存在缓存返回错误
               controller.add(ResponseData(ResponseType.CACHE, null,
-                  error: Constants.error_01, statusCode: 400));
+                  error: Constants.error_01,
+                  statusCode: Constants.responseCodeNoCache));
             }
           });
         }
@@ -137,15 +135,32 @@ class RxDio<T> {
               controller.add(new ResponseData(
                   ResponseType.CACHE, transformation(bean.data)));
             }
-          });
-          ApiService()
-              .getResponse<T>(url, params, httpMethod, host: host)
-              .listen((data) {
-            controller.add(new ResponseData(
-                ResponseType.NETWORK, transformation(data as T)));
-          }, onError: (error) {
-            controller.add(new ResponseData(ResponseType.ERROR, null,
-                error: error.toString(), statusCode: 500));
+            ApiService()
+                .getResponse<T>(url, params, httpMethod, host: host)
+                .listen((data) {
+              if (!controller.isClosed) {
+                controller.add(new ResponseData(
+                    ResponseType.NETWORK, transformation(data as T)));
+              } else {
+                if (callBack != null) {
+                  callBack.onNetFinish!(new ResponseData(
+                      ResponseType.NETWORK, transformation(data as T)));
+                }
+              }
+            }, onError: (error) {
+              if (!controller.isClosed) {
+                controller.add(new ResponseData(ResponseType.ERROR, null,
+                    error: error.toString(),
+                    statusCode: Constants.responseCodeNetworkError));
+              } else {
+                if (callBack != null) {
+                  callBack.onNetFinish!(new ResponseData(
+                      ResponseType.ERROR, null,
+                      error: error.toString(),
+                      statusCode: Constants.responseCodeNetworkError));
+                }
+              }
+            });
           });
         } else {
           //先获取缓存,在获取网络数据
@@ -159,22 +174,23 @@ class RxDio<T> {
             } else {
               //不存在缓存返回错误
               controller.add(ResponseData(ResponseType.CACHE, null,
-                  statusCode: 400, error: Constants.error_01));
+                  statusCode: Constants.responseCodeNoCache,
+                  error: Constants.error_01));
             }
           }, onError: (error) {
             controller.add(new ResponseData(ResponseType.ERROR, null,
-                error: error.toString(), statusCode: 500));
+                error: error.toString(),
+                statusCode: Constants.responseCodeNetworkError));
           });
         }
         break;
     }
-
     //使用观察这模式观察数据流
     controller.stream.listen((requestData) {
       if (callBack != null) {
         callBack.onNetFinish!(requestData);
       }
-      controller.close();
+      controller.close(); //这一行表示关闭这个监听
     });
   }
 }
