@@ -1,6 +1,7 @@
 name: flutter_dio_module
-description: A new Flutter plugin flutter_dio_module. Plug-in contains cache interceptor, can automatically cache network data, support abstract parsing objects, support Response object interception processing, the use of builder form is simple, easy to use, convenient, efficient!
+description: Plug-in contains cache interceptor, can automatically cache network data, support abstract parsing objects, support Response object interception processing
 homepage : https://gitee.com/xjdd/flutter-rx-dio.git
+author: xj
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
