@@ -19,7 +19,7 @@ author: xj
 # on any other native host app that you embed your Flutter project into.
 #versionCode：内部管理的版本号
 #versionName：用户显示的版本号
-version: 1.0.1
+version: 1.0.2
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
