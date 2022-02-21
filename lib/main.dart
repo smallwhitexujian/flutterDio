@@ -70,12 +70,11 @@ class _MyHomePageState extends State<MyHomePage> {
         print("======>" + p0?.datas[0].content);
         return p0;
       })
-      ..call(CallBack(onNetFinish: (data) {
-        print("asadsadasd---> ${data?.error}");
-        print("asadsadasd---> ${data?.statusCode}");
-        print("asadsadasd---> ${data?.responseType}");
-        print("asadsadasd---> ${data?.data?.datas.first.content}");
-      }));
+      ..streams().listen((event) {
+        _counter = event.responseType.toString();
+        print("asadsadasd--1-> ${event.responseType}");
+        print("asadsadasd--1-> ${event.data.toString()}");
+      });
 
     // RxDio<WanbeanEntity>()
     //   ..setUrl(Constants.config)
@@ -141,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              'You have pushed the button this many times:$_counter',
             ),
             Text(
               '$_counter',

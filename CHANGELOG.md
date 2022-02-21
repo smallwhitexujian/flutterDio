@@ -7,17 +7,17 @@ Encapsulate the network condition library according to Dio. [warehouse address] 
 The format is based on [Keep a Changelog] (https://keepachangelog.com/en/1.0.0/).
 And the project follows [semantic version Control] (https://semver.org/spec/v2.0.0.html).
 
-# # [released].
+## [中文文档](/CHANGELOG_cn.md).
 
-# # [1.0.0]-2022-02-16.
-# add.
+## [1.0.0]-2022-02-16.
+### add.
 -the first version is based on [dio] (https://github.com/flutterchina/dio) network request framework) for secondary encapsulation.
 
 Dio is a powerful Dart Http request library that supports Restful API, FormData, interceptor, request cancellation, Cookie management, file upload / download, timeout, custom adapters, etc.
 -the dio network request part is re-packaged by Dart with Steam or future, and the network data is cached in combination with sqlite for easy reading. The network data can be accessed through simple parameter settings.
 
-# # [1.0.1]-2022-02-18.
-# upgrade.
+## [1.0.1]-2022-02-18.
+### upgrade.
 - 1. When you optimize the network, you can dynamically modify the host address and modify it according to the business situation.
 - 2. `Transformations` cannot accurately determine the type before optimization. Currently, you can accurately determine the type. The usage of `Transformations` is as follows:
 ```dart 
@@ -33,3 +33,8 @@ NO_CACHE: direct network requests are not cached.
 REQUEST_FAILED_READ_CACHE: judge the network environment, get the network first, and get the cache when the network fails.
 FIRST_CACHE_THEN_REQUEST: trigger cache data first while requesting network data will trigger refresh twice, if cache does not exist, directly trigger network data. Then intercept the cache to sqlite in the network interceptor.
 - 5. RxdioConfig configuration initialization adjustment. Cache is enabled by default, print log output is turned off by default, and interceptor configuration is added.
+
+## [1.0.2]-2022-02-21.
+### RxDio adds Stream to return result mode.
+- 1. Optimize the return mode of network request and add Stream mode
+- 2. Callback will not upgrade to Stream mode in the later stage of maintenance.
