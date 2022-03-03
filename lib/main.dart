@@ -5,7 +5,7 @@ import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 
-import 'com/flutter/http/adapter/ResponseDatas.dart';
+import '../com/flutter/http/adapter/ResponseDatas.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
