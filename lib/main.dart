@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/app,data/Constants.dart';
 import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
+
+import 'com/flutter/http/adapter/ResponseDatas.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -71,36 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
       return p0;
     });
     return aaa.asStreams<WanbeanEntity>();
-    // RxDio<WanbeanEntity>()
-    //   ..setUrl(Constants.config)
-    //   ..setParams(null)
-    //   ..setCacheMode(CacheMode.DEFAULT)
-    //   ..setRequestMethod(Method.Get)
-    //   ..setTransFrom((p0) {
-    //     print("======>" + p0?.datas[0].content);
-    //     return p0;
-    //   })
-    //   ..streams().listen((event) {
-    //     _counter = event.responseType.toString();
-    //     print("asadsadasd--1-> ${event.responseType}");
-    //     print("asadsadasd--1-> ${event.data.toString()}");
-    //   });
-
-    // RxDio<WanbeanEntity>()
-    //   ..setUrl(Constants.config)
-    //   ..setParams(null)
-    //   ..setCacheMode(CacheMode.DEFAULT)
-    //   ..setRequestMethod(Method.Get)
-    //   ..call(CallBack(onNetFinish: (data, type) {
-    //     print("asadsadasd---> ${data?.statusCode}");
-    //     print("asadsadasd---> ${data?.data?.datas.first.content}");
-    //   }));
-    //   //
-    //   // ApiService()
-    //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
-    //   //     .listen((data) {
-    //   //   print("Stream  " + data.datas.toString());
-    //   // });
   }
 
   var a = 0;

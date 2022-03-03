@@ -38,3 +38,11 @@ FIRST_CACHE_THEN_REQUEST: trigger cache data first while requesting network data
 ### RxDio adds Stream to return result mode.
 - 1. Optimize the return mode of network request and add Stream mode
 - 2. Callback will not upgrade to Stream mode in the later stage of maintenance.
+
+## [1.0.3]-2022-03-03.
+### Rxdio adjustment creation mode supports singleton mode.
+- 1. RxDio supports singleton mode and Stream,future return data format.
+- 2. Add CancelToken parameter setting to create CancelToken by default.
+- 3. Add all cancel cancelAll (), specify cancel cancel (), batch cancel cancelList ().
+- 4. ApiService discarded.
+- 5. Modify part of the file name

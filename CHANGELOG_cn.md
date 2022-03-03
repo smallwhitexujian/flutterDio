@@ -52,3 +52,11 @@ FIRST_CACHE_THEN_REQUEST:优先触发缓存数据同时在请求网络数据会�
       });
 ``` 
 - 2. Callback后期不会在维护建议升级到Stream模式
+
+## [1.0.3]-2022-03-03.
+### Rxdio调整创建模式支持单例模式.
+- 1. RxDio支持单例模式,支持Stream,future返回数据格式
+- 2. 增加CancelToken 参数设置 默认创建CancelToken。
+- 3. 增加全部取消cancelAll(),指定取消cancel(),批量取消cancelList()
+- 4. ApiService废弃
+- 5. 修改部分文件名称

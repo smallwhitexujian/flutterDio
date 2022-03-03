@@ -9,3 +9,4 @@ export 'com/flutter/http/interface/BaseApplication.dart';
 export 'com/flutter/http/utils/MD5Utils.dart';
 export 'com/flutter/http/RxDio.dart';
 export 'com/flutter/http/RxDioConfig.dart';
+export 'com/flutter/http/adapter/ResponseDatas.dart';

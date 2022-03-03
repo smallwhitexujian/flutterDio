@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
+import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
+import 'package:flutter_dio_module/lib_dio.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -55,39 +56,20 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
-  void test() {
-    // RxDio<WanbeanEntity>()
-    //   ..setUrl(Constants.config)
-    //   ..setParams(null)
-    //   ..setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
-    //   ..setRequestMethod(Method.Get)
-    //   ..setTransFrom((p0) {
-    //     print("======>" + p0?.datas[0].content);
-    //     return p0;
-    //   })
-    //   ..call(CallBack(onNetFinish: (data) {
-    //     print("asadsadasd---> ${data?.error}");
-    //     print("asadsadasd---> ${data?.statusCode}");
-    //     print("asadsadasd---> ${data?.responseType}");
-    //   }));
-
-    // RxDio<WanbeanEntity>()
-    //   ..setUrl(Constants.config)
-    //   ..setParams(null)
-    //   ..setCacheMode(CacheMode.DEFAULT)
-    //   ..setRequestMethod(Method.Get)
-    //   ..call(CallBack(onNetFinish: (data, type) {
-    //     print("asadsadasd---> ${data?.statusCode}");
-    //     print("asadsadasd---> ${data?.data?.datas.first.content}");
-    //   }));
-    //   //
-    //   // ApiService()
-    //   //     .getResponse<WanbeanEntity>(Constants.config, null, Method.Get)
-    //   //     .listen((data) {
-    //   //   print("Stream  " + data.datas.toString());
-    //   // });
+  Stream<ResponseDatas<WanbeanEntity>> test() {
+    var aaa = RxDio.instance;
+    aaa.setUrl(Constants.config);
+    aaa.setCacheMode(CacheMode.DEFAULT);
+    aaa.setRequestMethod(Method.Get);
+    aaa.setTransFrom<WanbeanEntity>((p0) {
+      var a = p0 as WanbeanEntity;
+      print("=======setTransFrom>" + a.datas.first.content);
+      return p0;
+    });
+    return aaa.asStreams<WanbeanEntity>();
   }
 
+  var a = 0;
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -95,9 +77,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+      test();
     });
+  }
 
-    test();
+  @override
+  void dispose() {
+    RxDio.instance.cancelAll();
+    super.dispose();
   }
 
   @override
@@ -133,14 +120,18 @@ class _MyHomePageState extends State<MyHomePage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-
           children: <Widget>[
             Text(
-              'You have pushed the button this many times: $_counter',
+              'You have pushed the button this many times:$_counter',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            StreamBuilder<ResponseDatas<WanbeanEntity>>(
+              builder: ((context, snapshot) {
+                return Text(
+                  '${snapshot.data?.data?.size}',
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              }),
+              stream: test(),
             ),
           ],
         ),
