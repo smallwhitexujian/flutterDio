@@ -219,6 +219,7 @@ class RxDio {
     return await asStreams<T>().last;
   }
 
+  //生命周期结束
   void dispose() {
     RxDio.instance.cancelAll();
   }

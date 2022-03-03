@@ -4,6 +4,7 @@ import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 
 import 'adapter/Method.dart';
 
+@deprecated
 class ApiService {
   Stream getResponse<T>(String url, Map<String, dynamic>? params, Method method,
           {String host = ""}) =>
