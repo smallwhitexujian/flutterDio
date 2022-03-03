@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dio_module/com/app,data/Constants.dart';
-import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/CallBack.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
@@ -61,21 +56,20 @@ class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
   void test() {
-    RxDio<WanbeanEntity>()
-      ..setUrl(Constants.config)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
-      ..setRequestMethod(Method.Get)
-      ..setTransFrom((p0) {
-        print("======>" + p0?.datas[0].content);
-        return p0;
-      })
-      ..call(CallBack(onNetFinish: (data) {
-        print("asadsadasd---> ${data?.error}");
-        print("asadsadasd---> ${data?.statusCode}");
-        print("asadsadasd---> ${data?.responseType}");
-        print("asadsadasd---> ${data?.data?.datas.first.content}");
-      }));
+    // RxDio<WanbeanEntity>()
+    //   ..setUrl(Constants.config)
+    //   ..setParams(null)
+    //   ..setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+    //   ..setRequestMethod(Method.Get)
+    //   ..setTransFrom((p0) {
+    //     print("======>" + p0?.datas[0].content);
+    //     return p0;
+    //   })
+    //   ..call(CallBack(onNetFinish: (data) {
+    //     print("asadsadasd---> ${data?.error}");
+    //     print("asadsadasd---> ${data?.statusCode}");
+    //     print("asadsadasd---> ${data?.responseType}");
+    //   }));
 
     // RxDio<WanbeanEntity>()
     //   ..setUrl(Constants.config)

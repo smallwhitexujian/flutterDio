@@ -1,4 +1,4 @@
-typedef NetCallbackFunction<T> = void Function(ResponseData<T>?);
+typedef NetCallbackFunction<T> = void Function(ResponseDatas<T>?);
 
 ///回调
 class CallBack<T> {
@@ -8,14 +8,14 @@ class CallBack<T> {
 }
 
 ///构造一个Response数据模型，
-class ResponseData<T> {
-  late ResponseType responseType;
+class ResponseDatas<T> {
+  late ResponseTypes responseType;
   late int? statusCode;
   late String error;
   late T? data;
 
   //创建请求对象
-  ResponseData(ResponseType responseType, T? data,
+  ResponseDatas(ResponseTypes responseType, T? data,
       {int? statusCode = 200, String error = ""}) {
     this.responseType = responseType;
     this.statusCode = statusCode;
@@ -25,7 +25,7 @@ class ResponseData<T> {
 }
 
 ///请求的模式，是从网络，缓存还是其他类型返回数据
-enum ResponseType { NETWORK, CACHE, UNKOWN, ERROR }
+enum ResponseTypes { NETWORK, CACHE, UNKOWN, ERROR }
 
 ///缓存模型设置,设置缓存模型是属于哪一种
 enum CacheMode {

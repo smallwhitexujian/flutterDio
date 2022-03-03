@@ -60,21 +60,31 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
-  void test() {
-    RxDio<WanbeanEntity>()
-      ..setUrl(Constants.config)
-      ..setParams(null)
-      ..setCacheMode(CacheMode.DEFAULT)
-      ..setRequestMethod(Method.Get)
-      ..setTransFrom((p0) {
-        print("======>" + p0?.datas[0].content);
-        return p0;
-      })
-      ..streams().listen((event) {
-        _counter = event.responseType.toString();
-        print("asadsadasd--1-> ${event.responseType}");
-        print("asadsadasd--1-> ${event.data.toString()}");
-      });
+  Stream<ResponseDatas<WanbeanEntity>> test() {
+    var aaa = RxDio.instance;
+    aaa.setUrl(Constants.config);
+    aaa.setCacheMode(CacheMode.DEFAULT);
+    aaa.setRequestMethod(Method.Get);
+    aaa.setTransFrom<WanbeanEntity>((p0) {
+      var a = p0 as WanbeanEntity;
+      print("=======setTransFrom>" + a.datas.first.content);
+      return p0;
+    });
+    return aaa.asStreams<WanbeanEntity>();
+    // RxDio<WanbeanEntity>()
+    //   ..setUrl(Constants.config)
+    //   ..setParams(null)
+    //   ..setCacheMode(CacheMode.DEFAULT)
+    //   ..setRequestMethod(Method.Get)
+    //   ..setTransFrom((p0) {
+    //     print("======>" + p0?.datas[0].content);
+    //     return p0;
+    //   })
+    //   ..streams().listen((event) {
+    //     _counter = event.responseType.toString();
+    //     print("asadsadasd--1-> ${event.responseType}");
+    //     print("asadsadasd--1-> ${event.data.toString()}");
+    //   });
 
     // RxDio<WanbeanEntity>()
     //   ..setUrl(Constants.config)
@@ -93,6 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //   // });
   }
 
+  var a = 0;
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -100,9 +111,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+      test();
     });
+  }
 
-    test();
+  @override
+  void dispose() {
+    RxDio.instance.cancelAll();
+    super.dispose();
   }
 
   @override
@@ -142,9 +158,14 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:$_counter',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            StreamBuilder<ResponseDatas<WanbeanEntity>>(
+              builder: ((context, snapshot) {
+                return Text(
+                  '${snapshot.data?.data?.size}',
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              }),
+              stream: test(),
             ),
           ],
         ),

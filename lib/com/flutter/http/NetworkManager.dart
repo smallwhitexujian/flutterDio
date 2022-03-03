@@ -15,6 +15,7 @@ class NetworkManager {
   static NetworkManager? _instance;
   late Dio dio;
   late BaseOptions options;
+  static List<CancelToken?> _cancelTokenList = [];
 
   NetworkManager._internal() {
     ///初始化
@@ -62,10 +63,14 @@ class NetworkManager {
   }
 
   //flutter 重载并非重载而是可选参数或者参数默认值
-  Future<T> request<T>(String url,
-      {String host = "",
-      Method method = Method.Post,
-      Map<String, dynamic>? params}) async {
+  Future<T> request<T>(
+    String url, {
+    Map<String, dynamic>? params,
+    String host = "",
+    Method method = Method.Post,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     //对请求域名做切换
     if (host.isEmpty) {
       //域名为空的时候获取配置接口
@@ -77,18 +82,33 @@ class NetworkManager {
     // 返回结果，String类型
     Response<String> response;
     try {
+      ///添加cancelToken取消请求头
+      cancelToken ??= CancelToken();
+      _cancelTokenList.add(cancelToken);
       switch (method) {
         case Method.Post:
-          response = await dio.post(url, queryParameters: params);
+          response = await dio.post(url,
+              queryParameters: params,
+              options: options,
+              cancelToken: cancelToken);
           break;
         case Method.Get:
-          response = await dio.get(url, queryParameters: params);
+          response = await dio.get(url,
+              queryParameters: params,
+              options: options,
+              cancelToken: cancelToken);
           break;
         case Method.Delete:
-          response = await dio.delete(url, queryParameters: params);
+          response = await dio.delete(url,
+              queryParameters: params,
+              options: options,
+              cancelToken: cancelToken);
           break;
         case Method.Put:
-          response = await dio.put(url, queryParameters: params);
+          response = await dio.put(url,
+              queryParameters: params,
+              options: options,
+              cancelToken: cancelToken);
           break;
       }
       //这里判断是网络状态，并不是业务状态
@@ -107,6 +127,33 @@ class NetworkManager {
       }
     } on DioError catch (error) {
       return await Future.error(error);
+    } finally {
+      ///请求完成移除cancelToken
+      if (_cancelTokenList.contains(cancelToken)) {
+        _cancelTokenList.remove(cancelToken);
+      }
     }
+  }
+
+  ///取消指定的请求
+  void cancel(CancelToken? cancelToken) {
+    if (cancelToken != null && !cancelToken.isCancelled) {
+      cancelToken.cancel();
+    }
+  }
+
+  ///取消指定的请求
+  void cancelList(List<CancelToken>? cancelTokenList) {
+    cancelTokenList?.forEach((cancelToken) {
+      cancel(cancelToken);
+    });
+  }
+
+  ///取消所有请求
+  void cancelAll() {
+    _cancelTokenList.forEach((cancelToken) {
+      cancel(cancelToken);
+    });
+    _cancelTokenList.clear();
   }
 }
