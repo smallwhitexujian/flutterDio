@@ -73,7 +73,8 @@ class RxDio {
     this._transformation = transformation;
   }
 
-  factory RxDio() => _getInstance();
+  ///这里是单例
+  factory RxDio.create() => _getInstance();
 
   static RxDio get instance => _getInstance();
   static RxDio? _instance;
@@ -85,7 +86,11 @@ class RxDio {
     return _instance!;
   }
 
+  ///内部实现类
   RxDio._internal();
+
+  ///实例类
+  RxDio();
 
   //网络请求以及数据流程控制
   Stream<ResponseDatas<T>> asStreams<T>() async* {

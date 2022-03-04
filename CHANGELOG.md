@@ -11,7 +11,7 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
-## [1.0.6]-2022-03-04
+## [1.0.7]-2022-03-04
 
 1. 修改lib_dio.dart依赖
 
@@ -47,13 +47,12 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
  2. `Transformations` cannot accurately determine the type before optimization. Currently, you can accurately determine the type. The usage of `Transformations` is as follows
  3. RequestData adjustment. Previously, it is impossible to distinguish the returned data from packaging, resulting in data confusion in `Transformations`. After adjustment, add error type, add or decrease data source `ResponseType`: ERROR,CACHE,UNKOWN,NETWORK can source data from these aspects respectively.
  4. Adjust the logic of the network cache, the previous logic did not judge according to the network conditions, but now add the network condition judgment.
+ 5. RxdioConfig configuration initialization adjustment. Cache is enabled by default, print log output is turned off by default, and interceptor configuration is added.
 
 - DEFAULT: network request by default.
 - NO_CACHE: direct network requests are not cached.
 - REQUEST_FAILED_READ_CACHE: judge the network environment, get the network first, and get the cache when the network fails.
 - FIRST_CACHE_THEN_REQUEST: trigger cache data first while requesting network data will trigger refresh twice, if cache does not exist, directly trigger network data. Then intercept the cache to sqlite in the network interceptor.
-
-5. RxdioConfig configuration initialization adjustment. Cache is enabled by default, print log output is turned off by default, and interceptor configuration is added.
 
 ```dart
 ..setTransFrom((streamData) {
