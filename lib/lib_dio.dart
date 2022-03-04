@@ -12,5 +12,6 @@ export 'com/flutter/http/RxDioConfig.dart';
 export 'com/flutter/http/adapter/ResponseDatas.dart';
 
 export 'package:dio/dio.dart';
+export 'package:dio/src/cancel_token.dart';
 export 'package:json_annotation/json_annotation.dart';
 export 'package:rxdart/rxdart.dart';

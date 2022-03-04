@@ -11,7 +11,7 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
-## [1.0.5]-2022-03-04
+## [1.0.6]-2022-03-04
 
 1. 修改lib_dio.dart依赖
 
