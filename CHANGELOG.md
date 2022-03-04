@@ -39,7 +39,7 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
  1. Optimize the return mode of network request and add Stream mode
  2. Callback will not upgrade to Stream mode in the later stage of maintenance.
 
- ## [1.0.1]-2022-02-18
+## [1.0.1]-2022-02-18
 
 ### upgrade
 
