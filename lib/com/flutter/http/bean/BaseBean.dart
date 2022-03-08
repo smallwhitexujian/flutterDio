@@ -1,4 +1,5 @@
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
+import 'package:flutter_dio_module/lib_dio.dart';
 
 class BaseBean<T> {
   T? data;
@@ -27,7 +28,7 @@ class BaseBean<T> {
 
   //判断接口成功状态，一般情况是0或者200状态 根据业务判断
   bool isSuccess() {
-    if (code == 0) {
+    if (code == Constants.statusCode) {
       return true;
     } else {
       return false;
