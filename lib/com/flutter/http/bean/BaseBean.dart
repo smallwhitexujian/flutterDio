@@ -11,8 +11,8 @@ class BaseBean<T> {
     if (json['data'] != null && json['data'] != 'null') {
       data = JsonConvert.fromJsonAsT<T>(json['data']);
     }
-    code = json['errorCode'];
-    message = json['errorMsg'];
+    code = json['code'];
+    message = json['message'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,8 +20,8 @@ class BaseBean<T> {
     if (this.data != null) {
       data['data'] = this.data;
     }
-    data['errorCode'] = this.code;
-    data['errorMsg'] = this.message;
+    data['code'] = this.code;
+    data['message'] = this.message;
     return data;
   }
 
