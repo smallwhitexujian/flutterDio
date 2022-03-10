@@ -8,8 +8,8 @@ import 'MD5Utils.dart';
 
 ///缓存管理类
 class CacheManagers {
-  static Future init() async {
-    return await DatabaseSql.initDatabase();
+  static init() {
+    return DatabaseSql.initDatabase();
   }
 
   //创建缓存的key
@@ -31,7 +31,8 @@ class CacheManagers {
   }
 
   //获取缓存 查询单条数据 Stream
-  static Stream<String> getCache(String? path, Map<String, dynamic>? params) {
+  static Future<Stream<String>> getCache(
+      String? path, Map<String, dynamic>? params) async {
     if (!RxDioConfig.intstance.getCahceState()) {
       throw Exception("GlobalConfig isUserCache need ture!!!");
     }

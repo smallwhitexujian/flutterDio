@@ -142,7 +142,8 @@ class RxDio {
                 statusCode: Constants.responseCodeNetworkError));
           });
         } else {
-          CacheManagers.getCache(_url, _params).listen((event) {
+          var straem = await CacheManagers.getCache(_url, _params);
+          straem.listen((event) {
             if (event.isNotEmpty) {
               //存在缓存返回缓存
               Map<String, dynamic> jsonData = json.decode(event);
@@ -162,7 +163,8 @@ class RxDio {
         if (connectivityResult == ConnectivityResult.mobile ||
             connectivityResult == ConnectivityResult.wifi) {
           //先获取缓存,在获取网络数据
-          CacheManagers.getCache(_url, _params).listen((event) {
+          var stream = await CacheManagers.getCache(_url, _params);
+          stream.listen((event) {
             if (event.isNotEmpty) {
               //存在缓存返回缓存
               Map<String, dynamic> jsonData = json.decode(event);
@@ -192,7 +194,8 @@ class RxDio {
           });
         } else {
           //先获取缓存,在获取网络数据
-          CacheManagers.getCache(_url, _params).listen((event) {
+          var stream = await CacheManagers.getCache(_url, _params);
+          stream.listen((event) {
             if (event.isNotEmpty) {
               //存在缓存返回缓存
               Map<String, dynamic> jsonData = json.decode(event);

@@ -10,14 +10,16 @@ class DatabaseSql {
   static String dbTableName = "HttpCache";
 
   // 初始化
-  static Future<void> initDatabase() async {
-    if (!isDatabaseReady) {
+  static Future initDatabase() {
+    Future future = new Future(() async {
       String databasePath = await createDatabase();
       Database database = await openCacheDatabase(databasePath);
       DatabaseSql.database = database;
       isDatabaseReady = true;
       print("====数据库初始化完毕==>");
-    }
+      return "0";
+    });
+    return future;
   }
 
   //创建数据库

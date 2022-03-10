@@ -59,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Stream<ResponseDatas<WanbeanEntity>> test() {
     var aaa = RxDio.instance;
     aaa.setUrl(Constants.config);
-    aaa.setHost("wwww");
     aaa.setCacheMode(CacheMode.DEFAULT);
     aaa.setRequestMethod(Method.Get);
     aaa.setTransFrom<WanbeanEntity>((p0) {

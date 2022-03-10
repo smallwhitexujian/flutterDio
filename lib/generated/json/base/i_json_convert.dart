@@ -11,11 +11,9 @@ abstract class IJsonConvert {
 
   T? asT<T extends Object?>(dynamic value);
 
-  //Go back to a single instance by type
-  M? _fromJsonSingle<M>(Map<String, dynamic> json);
+  M? fromJsonSingle<M>(Map<String, dynamic> json);
 
-  //list is returned by type
-  M? _getListChildType<M>(List<Map<String, dynamic>> data);
+  M? getListChildType<M>(List<Map<String, dynamic>> data);
 
   M? fromJsonAsT<M>(dynamic json);
 }

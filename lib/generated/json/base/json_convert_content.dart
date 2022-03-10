@@ -75,7 +75,7 @@ class JsonConvert extends IJsonConvert {
   }
 
   //Go back to a single instance by type
-  static M? _fromJsonSingle<M>(Map<String, dynamic> json) {
+  M? fromJsonSingle<M>(Map<String, dynamic> json) {
     final String type = M.toString();
     if (type == (WanbeanEntity).toString()) {
       return WanbeanEntity.fromJson(json) as M;
@@ -91,7 +91,7 @@ class JsonConvert extends IJsonConvert {
   }
 
   //list is returned by type
-  M? _getListChildType<M>(List<Map<String, dynamic>> data) {
+  M? getListChildType<M>(List<Map<String, dynamic>> data) {
     if (<WanbeanEntity>[] is M) {
       return data
           .map<WanbeanEntity>(
@@ -115,16 +115,15 @@ class JsonConvert extends IJsonConvert {
     return null;
   }
 
-  @override
   M? fromJsonAsT<M>(dynamic json) {
     if (json == null) {
       return null;
     }
     if (json is List) {
-      return _getListChildType<M>(
+      return getListChildType<M>(
           json.map((e) => e as Map<String, dynamic>).toList());
     } else {
-      return _fromJsonSingle<M>(json as Map<String, dynamic>);
+      return fromJsonSingle<M>(json as Map<String, dynamic>);
     }
   }
 }
