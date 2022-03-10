@@ -2,15 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/interface/BaseApplication.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
+import 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
+import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 
 class GlobalConfig extends BaseApplication {
   //是否是debug模式
-  bool isDebug = false;
+  bool _isDebug = false;
 
   //是否使用缓存模型
-  bool isUserCache = true;
+  bool _isUserCache = true;
 
-  String baseUrl = "";
+  String _baseUrl = "";
+
+  IJsonConvert _iJsonConvert = JsonConvert(); //解析关键
 
   factory GlobalConfig() => _getIntstance();
 
@@ -28,16 +32,36 @@ class GlobalConfig extends BaseApplication {
     return _instance!;
   }
 
+  void setJsonConvert(JsonConvert jsonConvert) {
+    this._iJsonConvert = jsonConvert;
+  }
+
+  IJsonConvert getJsonConvert() {
+    return _iJsonConvert;
+  }
+
   void setHost(String host) {
-    this.baseUrl = host;
+    this._baseUrl = host;
+  }
+
+  String getHost() {
+    return _baseUrl;
   }
 
   void setDebugConfig(bool isDebug) {
-    this.isDebug = isDebug;
+    this._isDebug = isDebug;
+  }
+
+  bool getDebug() {
+    return _isDebug;
   }
 
   void setUserCacheConfig(bool isUserCache) {
-    this.isUserCache = isUserCache;
+    this._isUserCache = isUserCache;
+  }
+
+  bool getCahceState() {
+    return _isUserCache;
   }
 
   /*
@@ -56,15 +80,17 @@ class GlobalConfig extends BaseApplication {
 
   @override
   init() {
-    if (isUserCache) {
+    if (_isUserCache) {
       CacheManagers.init(); //初始化缓存数据库
     }
   }
 
   //程序初始化入口
-  initConfig(String baseUrl, {bool isDebug = false, bool isUserChache = true}) {
-    this.baseUrl = baseUrl;
-    this.isDebug = isDebug;
-    this.isUserCache = isUserChache;
+  initConfig(String baseUrl,
+      {bool isDebug = false, bool isUserChache = true, jsonConvert}) {
+    this._baseUrl = baseUrl;
+    this._isDebug = isDebug;
+    this._isUserCache = isUserChache;
+    this._iJsonConvert = jsonConvert;
   }
 }

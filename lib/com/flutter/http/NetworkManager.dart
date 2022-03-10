@@ -21,14 +21,14 @@ class NetworkManager {
     ///初始化
     dio = Dio()
       ..options = BaseOptions(
-          baseUrl: GlobalConfig.intstance.baseUrl,
+          baseUrl: GlobalConfig.intstance.getHost(),
           connectTimeout: 10000,
           receiveTimeout: 1000 * 60 * 60 * 24,
           responseType: ResponseType.plain,
           sendTimeout: 10000,
           headers: {"Content-Type": "application/json"})
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor(GlobalConfig.intstance.isDebug))
+      ..interceptors.add(HttpLogInterceptor(GlobalConfig.intstance.getDebug()))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
   }
 
@@ -74,7 +74,7 @@ class NetworkManager {
     //对请求域名做切换
     if (host.isEmpty) {
       //域名为空的时候获取配置接口
-      dio.options.baseUrl = GlobalConfig.intstance.baseUrl;
+      dio.options.baseUrl = GlobalConfig.intstance.getHost();
     } else {
       //域名有值则直接获取域名
       dio.options.baseUrl = host;

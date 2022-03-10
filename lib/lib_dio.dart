@@ -15,3 +15,4 @@ export 'package:dio/dio.dart';
 export 'package:dio/src/cancel_token.dart';
 export 'package:json_annotation/json_annotation.dart';
 export 'package:rxdart/rxdart.dart';
+export 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';

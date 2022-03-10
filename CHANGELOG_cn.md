@@ -8,10 +8,16 @@
 
 ## [English documents](/CHANGELOG.md)
 
+## [1.1.0]-2022-03-10
+
+1.修改泛型解析无法指向正确的T泛型;
+2.将IJsonConvert接口实现继承
+3.需要在初始化的时候设置到变量中去
+
 ## [1.0.9]-2022-03-08
 
 1. 修改lib_dio.dart依赖
-2. 修改BaseBean.dart
+2. 修改BaseBean.dart.
 
 ## [1.0.4]-2022-03-04
 

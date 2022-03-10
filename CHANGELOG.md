@@ -11,10 +11,16 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
+## [1.1.0]-2022-03-10
+
+1. Modified generics parsing cannot point to the correct T generics.
+2. Inherit the IJsonConvert interface implementation.
+3. It needs to be set to the variable during initialization.
+
 ## [1.0.9]-2022-03-08
 
-1. 修改lib_dio.dart依赖
-2. 修改BaseBean.dart
+1. Modify lib_dio.dart dependency.
+2. Modify BaseBean.dart
 
 ## [1.0.4]-2022-03-04
 

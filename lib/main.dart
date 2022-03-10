@@ -12,7 +12,7 @@ void main() => Global.init().then((e) => runApp(MyApp()));
 class Global {
   static Future init() async {
     return GlobalConfig.intstance
-      ..setDebugConfig(false)
+      ..setDebugConfig(true)
       ..setHost("https://wanandroid.com/")
       ..setUserCacheConfig(true);
   }
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
             StreamBuilder<ResponseDatas<WanbeanEntity>>(
               builder: ((context, snapshot) {
                 return Text(
-                  '${snapshot.data?.data?.size}',
+                  '${snapshot.data?.data?.total}',
                   style: Theme.of(context).textTheme.headline4,
                 );
               }),

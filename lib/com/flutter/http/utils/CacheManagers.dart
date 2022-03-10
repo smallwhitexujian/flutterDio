@@ -32,7 +32,7 @@ class CacheManagers {
 
   //获取缓存 查询单条数据 Stream
   static Stream<String> getCache(String? path, Map<String, dynamic>? params) {
-    if (!GlobalConfig.intstance.isUserCache) {
+    if (!GlobalConfig.intstance.getCahceState()) {
       throw Exception("GlobalConfig isUserCache need ture!!!");
     }
 
@@ -89,7 +89,7 @@ class CacheManagers {
     }, onError: (DioError e, ErrorInterceptorHandler handler) {
       return handler.next(e);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) {
-      if (GlobalConfig.intstance.isUserCache) {
+      if (GlobalConfig.intstance.getCahceState()) {
         saveCache(path, map, response.data);
       }
       return handler.next(response);

@@ -8,7 +8,7 @@
 [pub.flutter.io](https://pub.flutter-io.cn/packages/flutter_dio_module/score)
 
 ```dart
-  flutter_dio_module: ^1.0.9
+  flutter_dio_module: ^1.1.0
 ```
 
 ## 项目目录结构
@@ -84,13 +84,30 @@ String sats = newsBean.result.stat;
 class Global {
   static Future init() async {
     return GlobalConfig.intstance
-      ..setDebugConfig(false)
+      ..setDebugConfig(true)
       ..setHost("https://wanandroid.com/")
-      ..setUserCacheConfig(true);
+      ..setUserCacheConfig(true)
+      ..setJsonConvert(jsonConvert);//次参数为必选项,用于解析使用,JsonConvert()需要继承IJsonConvert
   }
 }
 
 void main() => Global.init().then((e) => runApp(MyApp()));
+```
+
+### 设置JsonConvert()类
+
+找到目录`'package:workspac/generated/json/base/json_convert.content.dart'`继承`IJsonConvert`
+
+如果找不到`json_convert.content.dart`使用FlutterJsonBeanFactory插件导入一下即可
+
+```dart
+class JsonConvert extends IJsonConvert {
+  T? convert<T>(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    return asT<T>(value);
+  }
 ```
 
 ### RxDio模式解析
