@@ -5,7 +5,7 @@ import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 
-class GlobalConfig extends BaseApplication {
+class RxDioConfig extends BaseApplication {
   //是否是debug模式
   bool _isDebug = false;
 
@@ -16,23 +16,23 @@ class GlobalConfig extends BaseApplication {
 
   IJsonConvert _iJsonConvert = JsonConvert(); //解析关键
 
-  factory GlobalConfig() => _getIntstance();
+  factory RxDioConfig() => _getIntstance();
 
-  static GlobalConfig get intstance => _getIntstance();
-  static GlobalConfig? _instance;
+  static RxDioConfig get intstance => _getIntstance();
+  static RxDioConfig? _instance;
 
-  GlobalConfig._create() {
+  RxDioConfig._create() {
     init();
   }
 
-  static GlobalConfig _getIntstance() {
+  static RxDioConfig _getIntstance() {
     if (_instance == null) {
-      _instance = new GlobalConfig._create();
+      _instance = new RxDioConfig._create();
     }
     return _instance!;
   }
 
-  void setJsonConvert(JsonConvert jsonConvert) {
+  void setJsonConvert(IJsonConvert jsonConvert) {
     this._iJsonConvert = jsonConvert;
   }
 

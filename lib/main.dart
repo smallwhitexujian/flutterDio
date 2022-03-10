@@ -11,7 +11,7 @@ void main() => Global.init().then((e) => runApp(MyApp()));
 
 class Global {
   static Future init() async {
-    return GlobalConfig.intstance
+    return RxDioConfig.intstance
       ..setDebugConfig(true)
       ..setHost("https://wanandroid.com/")
       ..setUserCacheConfig(true);
