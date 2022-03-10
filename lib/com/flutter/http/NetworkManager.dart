@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'interceptorss/HttpLogInterceptor.dart';
 
@@ -14,22 +16,40 @@ class NetworkManager {
   static NetworkManager get instance => _getInstance();
   static NetworkManager? _instance;
   late Dio dio;
-  late BaseOptions options;
+
+  ///默认的配置
+  BaseOptions defultOptions = BaseOptions(
+      baseUrl: RxDioConfig.intstance.getHost(),
+      connectTimeout: 10000, //连接超时
+      receiveTimeout: 60000, //接受超时
+      responseType: ResponseType.plain,
+      sendTimeout: 10000,
+      headers: {"Content-Type": "application/json"});
+
+  ///可以取消的token
   static List<CancelToken?> _cancelTokenList = [];
 
   NetworkManager._internal() {
     ///初始化
     dio = Dio()
-      ..options = BaseOptions(
-          baseUrl: RxDioConfig.intstance.getHost(),
-          connectTimeout: 10000,
-          receiveTimeout: 1000 * 60 * 60 * 24,
-          responseType: ResponseType.plain,
-          sendTimeout: 10000,
-          headers: {"Content-Type": "application/json"})
+      ..options = defultOptions
       // //拦截器
       ..interceptors.add(HttpLogInterceptor(RxDioConfig.intstance.getDebug()))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
+    if (RxDioConfig.intstance.getDebug()) {
+      // 在isDebug模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        // 设置代理抓包，调试用
+        // client.findProxy = (uri) {
+        //   return 'PROXY 192.168.50.154:8888';
+        // };
+        //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      };
+    }
   }
 
   static NetworkManager _getInstance() {
@@ -62,7 +82,12 @@ class NetworkManager {
     }
   }
 
-  //flutter 重载并非重载而是可选参数或者参数默认值
+  ///dio 网络请求 网络请求每个请求配置的优先级最高,其次才是默认配置
+  ///[url] 接口地址
+  ///[params]参数地址
+  ///[host]接口域名
+  ///[options] 配置信息
+  ///[cancelToken]接口取消token
   Future<T> request<T>(
     String url, {
     Map<String, dynamic>? params,

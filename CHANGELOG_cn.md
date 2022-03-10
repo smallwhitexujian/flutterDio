@@ -8,7 +8,7 @@
 
 ## [English documents](/CHANGELOG.md)
 
-## [1.1.1]-2022-03-10
+## [1.1.2]-2022-03-10
 
 1.修改泛型解析无法指向正确的T泛型;
 2.将IJsonConvert接口实现继承

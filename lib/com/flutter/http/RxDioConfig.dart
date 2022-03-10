@@ -1,11 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
-import 'package:flutter_dio_module/com/flutter/http/interface/BaseApplication.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 
-class RxDioConfig extends BaseApplication {
+class RxDioConfig {
   //是否是debug模式
   bool _isDebug = false;
 
@@ -64,33 +63,19 @@ class RxDioConfig extends BaseApplication {
     return _isUserCache;
   }
 
-  /*
-   * @param interceptor 拦截器
-   */
+  ///[Interceptors] interceptors 拦截器
   void setInterceptor(Interceptor? interceptor) {
     NetworkManager.instance.setInterceptor(interceptor);
   }
 
-  /*
-   * @param interceptors 拦截器s
-   */
+  ///[Interceptors] interceptors 拦截器s
   void setInterceptors(Interceptors interceptors) {
     NetworkManager.instance.setInterceptors(interceptors);
   }
 
-  @override
   init() {
     if (_isUserCache) {
       CacheManagers.init(); //初始化缓存数据库
     }
-  }
-
-  //程序初始化入口
-  initConfig(String baseUrl,
-      {bool isDebug = false, bool isUserChache = true, jsonConvert}) {
-    this._baseUrl = baseUrl;
-    this._isDebug = isDebug;
-    this._isUserCache = isUserChache;
-    this._iJsonConvert = jsonConvert;
   }
 }

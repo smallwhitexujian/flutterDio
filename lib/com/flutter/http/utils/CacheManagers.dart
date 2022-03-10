@@ -8,8 +8,8 @@ import 'MD5Utils.dart';
 
 ///缓存管理类
 class CacheManagers {
-  static init() {
-    DatabaseSql.initDatabase();
+  static Future init() async {
+    return await DatabaseSql.initDatabase();
   }
 
   //创建缓存的key

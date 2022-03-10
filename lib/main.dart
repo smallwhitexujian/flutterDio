@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dio_module/com/app,data/Constants.dart';
 import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDio.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
-
-import '../com/flutter/http/adapter/ResponseDatas.dart';
+import 'package:flutter_dio_module/lib_dio.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
@@ -64,11 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Stream<ResponseDatas<WanbeanEntity>> test() {
     var aaa = RxDio.instance;
     aaa.setUrl(Constants.config);
+    aaa.setHost("wwww");
     aaa.setCacheMode(CacheMode.DEFAULT);
     aaa.setRequestMethod(Method.Get);
     aaa.setTransFrom<WanbeanEntity>((p0) {
       var a = p0 as WanbeanEntity;
-      print("=======setTransFrom>" + a.datas.first.content);
       return p0;
     });
     return aaa.asStreams<WanbeanEntity>();

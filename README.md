@@ -8,7 +8,7 @@
 [pub.flutter.io](https://pub.flutter-io.cn/packages/flutter_dio_module/score)
 
 ```dart
-  flutter_dio_module: ^1.1.0
+  flutter_dio_module: ^1.1.2
 ```
 
 ## 项目目录结构
@@ -116,6 +116,7 @@ class JsonConvert extends IJsonConvert {
 Stream<ResponseDatas<WanbeanEntity>> test() {
   var aaa = RxDio.instance;
   aaa.setUrl(Constants.config);
+  aaa.setHost("www.baidu.com");//设置域名
   aaa.setCacheMode(CacheMode.DEFAULT);
   aaa.setRequestMethod(Method.Get);
   aaa.setTransFrom<WanbeanEntity>((p0) {
