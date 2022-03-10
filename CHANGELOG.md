@@ -11,7 +11,7 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
-## [1.1.2]-2022-03-10
+## [1.1.3]-2022-03-10
 
 1. Modified generics parsing cannot point to the correct T generics.
 2. Inherit the IJsonConvert interface implementation.
