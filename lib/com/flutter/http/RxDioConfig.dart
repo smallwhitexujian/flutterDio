@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 import 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
-import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 
 class RxDioConfig {
   //是否是debug模式
@@ -13,7 +12,7 @@ class RxDioConfig {
 
   String _baseUrl = "";
 
-  IJsonConvert _iJsonConvert = JsonConvert(); //解析关键
+  late IJsonConvert _iJsonConvert; //解析关键
 
   factory RxDioConfig() => _getIntstance();
 

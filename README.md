@@ -8,7 +8,7 @@
 [pub.flutter.io](https://pub.flutter-io.cn/packages/flutter_dio_module/score)
 
 ```dart
-  flutter_dio_module: ^1.1.2
+  flutter_dio_module: ^1.1.4
 ```
 
 ## 项目目录结构
@@ -60,6 +60,20 @@ http 为插件源码仓库
 使用方法
 
 ```dart
+//在项目中初始化实现改接口
+abstract class IJsonConvert {
+  M? fromJsonAsT<M>(dynamic json);
+}
+
+class jsonbase extends IJsonConvert {
+  @override
+  M? fromJsonAsT<M>(json) {
+    ///这里JsonConvert对象为当前工作空间的
+    return JsonConvert().fromJsonAsT(json);
+  }
+}
+
+
 /*先将字符串转成json*/
 Map<String, dynamic> json = jsonDecode(jsonData);
 /*将Json转成实体类*/

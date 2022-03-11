@@ -3,13 +3,5 @@
 // ignore_for_file: prefer_single_quotes
 
 abstract class IJsonConvert {
-  T? convert<T>(dynamic value);
-
-  List<T?>? convertList<T>(List<dynamic>? value);
-
-  List<T>? convertListNotNull<T>(dynamic value);
-
-  T? asT<T extends Object?>(dynamic value);
-
   M? fromJsonAsT<M>(dynamic json);
 }
