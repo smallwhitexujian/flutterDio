@@ -8,6 +8,10 @@
 
 ## [English documents](/CHANGELOG.md)
 
+## [1.1.5]-2022-03-2
+
+1. 修改NetworkManager.dart增加body data数据,之前不支持body.
+
 ## [1.1.4]-2022-03-10
 
 1.修改泛型解析无法指向正确的T泛型;

@@ -15,30 +15,32 @@ class NetworkManager {
 
   static NetworkManager get instance => _getInstance();
   static NetworkManager? _instance;
-  late Dio dio;
+  late Dio _dio;
+  BaseOptions? _options;
 
   ///默认的配置
   BaseOptions defultOptions = BaseOptions(
-      baseUrl: RxDioConfig.intstance.getHost(),
-      connectTimeout: 10000, //连接超时
-      receiveTimeout: 60000, //接受超时
-      responseType: ResponseType.plain,
-      sendTimeout: 10000,
-      headers: {"Content-Type": "application/json"});
+    baseUrl: RxDioConfig.intstance.getHost(),
+    connectTimeout: 10000, //连接超时
+    receiveTimeout: 60000, //接受超时
+    responseType: ResponseType.plain,
+    sendTimeout: 10000,
+    headers: {"Content-Type": "application/json"},
+  );
 
   ///可以取消的token
   static List<CancelToken?> _cancelTokenList = [];
 
   NetworkManager._internal() {
     ///初始化
-    dio = Dio()
-      ..options = defultOptions
+    _dio = Dio()
+      ..options = _options ?? defultOptions
       // //拦截器
       ..interceptors.add(HttpLogInterceptor(RxDioConfig.intstance.getDebug()))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
     if (RxDioConfig.intstance.getDebug()) {
       // 在isDebug模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (client) {
         // 设置代理抓包，调试用
         // client.findProxy = (uri) {
@@ -50,6 +52,16 @@ class NetworkManager {
         return client;
       };
     }
+  }
+
+  ///设置自定义的BaseOptions
+  setBaseOptions(BaseOptions options) {
+    _options = options;
+  }
+
+  ///获取dio
+  Dio getDio() {
+    return _dio;
   }
 
   static NetworkManager _getInstance() {
@@ -67,18 +79,18 @@ class NetworkManager {
       //将自定义拦截器加入
       interceptors.add(interceptor);
     }
-    bool container = dio.interceptors.contains(interceptors); //去重
+    bool container = _dio.interceptors.contains(interceptors); //去重
     if (!container) {
-      dio.interceptors.addAll(interceptors);
+      _dio.interceptors.addAll(interceptors);
     }
   }
 
 // 创建全局的拦截器(默认拦截器)
   void setInterceptors(Interceptors interceptors) {
     // 统一添加到拦截区中
-    bool isContainer = dio.interceptors.contains(interceptors); //去重
+    bool isContainer = _dio.interceptors.contains(interceptors); //去重
     if (!isContainer) {
-      dio.interceptors.addAll(interceptors);
+      _dio.interceptors.addAll(interceptors);
     }
   }
 
@@ -99,10 +111,10 @@ class NetworkManager {
     //对请求域名做切换
     if (host.isEmpty) {
       //域名为空的时候获取配置接口
-      dio.options.baseUrl = RxDioConfig.intstance.getHost();
+      _dio.options.baseUrl = RxDioConfig.intstance.getHost();
     } else {
       //域名有值则直接获取域名
-      dio.options.baseUrl = host;
+      _dio.options.baseUrl = host;
     }
     // 返回结果，String类型
     Response<String> response;
@@ -112,26 +124,29 @@ class NetworkManager {
       _cancelTokenList.add(cancelToken);
       switch (method) {
         case Method.Post:
-          response = await dio.post(url,
+          response = await _dio.post(url,
               queryParameters: params,
+              data: params,
               options: options,
               cancelToken: cancelToken);
           break;
         case Method.Get:
-          response = await dio.get(url,
+          response = await _dio.get(url,
               queryParameters: params,
               options: options,
               cancelToken: cancelToken);
           break;
         case Method.Delete:
-          response = await dio.delete(url,
+          response = await _dio.delete(url,
               queryParameters: params,
+              data: params,
               options: options,
               cancelToken: cancelToken);
           break;
         case Method.Put:
-          response = await dio.put(url,
+          response = await _dio.put(url,
               queryParameters: params,
+              data: params,
               options: options,
               cancelToken: cancelToken);
           break;
