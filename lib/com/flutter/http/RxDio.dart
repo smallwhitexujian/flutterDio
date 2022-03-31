@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
-import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
 ///typedef就是给Function取个别名，如
@@ -93,137 +93,137 @@ class RxDio {
   RxDio();
 
   //网络请求以及数据流程控制
-  Stream<ResponseDatas<T>> asStreams<T>() async* {
+  Stream<ResponseDates<T>> asStreams<T>() async* {
     //创建Stream监听,使用Controller的时候一定要close 否者会报错
-    StreamController<ResponseDatas<T>> controller =
-        new StreamController<ResponseDatas<T>>();
-    //网络条件判断
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    //判断缓存模型没有缓存
-    switch (_cacheMode) {
-      case CacheMode.DEFAULT:
-      case CacheMode.NO_CACHE:
-        //默认没有缓存
-        NetworkManager.instance
-            .request<T>(_url,
-                params: _params,
-                method: _httpMethod,
-                host: _host,
-                options: _options,
-                cancelToken: _cancelToken)
-            .then((data) {
-          controller.add(new ResponseDatas<T>(
-              ResponseTypes.NETWORK, _transformation(data)));
-        }, onError: (error) {
-          controller.add(new ResponseDatas(ResponseTypes.ERROR, null,
-              error: error.toString(),
-              statusCode: Constants.responseCodeNetworkError));
-        });
-        break;
-      case CacheMode.REQUEST_FAILED_READ_CACHE:
-        //先获取网络,当网络不存在的时候获取缓存数据
-        if (connectivityResult == ConnectivityResult.mobile ||
-            connectivityResult == ConnectivityResult.wifi) {
+    StreamController<ResponseDates<T>> controller =
+        new StreamController<ResponseDates<T>>();
+    try {
+      if (!RxDioConfig.instance.getCacheState()) {
+        _cacheMode = CacheMode.DEFAULT;
+      }
+      //网络条件判断
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      //判断缓存模型没有缓存
+      switch (_cacheMode) {
+        case CacheMode.DEFAULT:
+        case CacheMode.NO_CACHE:
+          //默认没有缓存
           NetworkManager.instance
               .request<T>(_url,
                   params: _params,
                   method: _httpMethod,
                   host: _host,
                   options: _options,
-                  cancelToken: _cancelToken ??= CancelToken())
+                  cancelToken: _cancelToken)
               .then((data) {
-            if (data.runtimeType == T) {
-              controller.add(new ResponseDatas(
-                  ResponseTypes.NETWORK, _transformation(data)));
-            }
+            controller.add(new ResponseDates<T>(
+                ResponseTypes.NETWORK, _transformation(data)));
           }, onError: (error) {
-            controller.add(new ResponseDatas(ResponseTypes.ERROR, null,
+            controller.add(new ResponseDates(ResponseTypes.ERROR, null,
                 error: error.toString(),
                 statusCode: Constants.responseCodeNetworkError));
           });
-        } else {
-          var straem = await CacheManagers.getCache(_url, _params);
-          straem.listen((event) {
-            if (event.isNotEmpty) {
-              //存在缓存返回缓存
-              Map<String, dynamic> jsonData = json.decode(event);
-              BaseBean bean = BaseBean<T>.fromJson(jsonData);
-              controller.add(new ResponseDatas(
-                  ResponseTypes.CACHE, _transformation(bean.data)));
-            } else {
-              //不存在缓存返回错误
-              controller.add(ResponseDatas(ResponseTypes.CACHE, null,
-                  error: Constants.error_01,
-                  statusCode: Constants.responseCodeNoCache));
-            }
-          });
-        }
-        break;
-      case CacheMode.FIRST_CACHE_THEN_REQUEST:
-        if (connectivityResult == ConnectivityResult.mobile ||
-            connectivityResult == ConnectivityResult.wifi) {
-          //先获取缓存,在获取网络数据
-          var stream = await CacheManagers.getCache(_url, _params);
-          stream.listen((event) {
-            if (event.isNotEmpty) {
-              //存在缓存返回缓存
-              Map<String, dynamic> jsonData = json.decode(event);
-              BaseBean bean = BaseBean<T>.fromJson(jsonData);
-              controller.add(new ResponseDatas(
-                  ResponseTypes.CACHE, _transformation(bean.data)));
-            }
+          break;
+        case CacheMode.REQUEST_FAILED_READ_CACHE:
+          //先获取网络,当网络不存在的时候获取缓存数据
+          if (connectivityResult == ConnectivityResult.mobile ||
+              connectivityResult == ConnectivityResult.wifi) {
             NetworkManager.instance
                 .request<T>(_url,
                     params: _params,
                     method: _httpMethod,
                     host: _host,
                     options: _options,
-                    cancelToken: _cancelToken)
+                    cancelToken: _cancelToken ??= CancelToken())
                 .then((data) {
-              if (!controller.isClosed) {
-                controller.add(new ResponseDatas(
+              if (data.runtimeType == T) {
+                controller.add(new ResponseDates(
                     ResponseTypes.NETWORK, _transformation(data)));
               }
             }, onError: (error) {
-              if (!controller.isClosed) {
-                controller.add(new ResponseDatas(ResponseTypes.ERROR, null,
-                    error: error.toString(),
-                    statusCode: Constants.responseCodeNetworkError));
-              }
+              controller.add(new ResponseDates(ResponseTypes.ERROR, null,
+                  error: error.toString(),
+                  statusCode: Constants.responseCodeNetworkError));
             });
-          });
-        } else {
-          //先获取缓存,在获取网络数据
-          var stream = await CacheManagers.getCache(_url, _params);
-          stream.listen((event) {
-            if (event.isNotEmpty) {
-              //存在缓存返回缓存
-              Map<String, dynamic> jsonData = json.decode(event);
-              BaseBean bean = BaseBean<T>.fromJson(jsonData);
-              controller.add(new ResponseDatas(
-                  ResponseTypes.CACHE, _transformation(bean.data)));
+          } else {
+            var cacheData = await RxDioConfig.instance
+                .getCacheInterface()
+                ?.getCache(_url, _params);
+            if (cacheData != null) {
+              if (cacheData.isNotEmpty) {
+                //存在缓存返回缓存
+                Map<String, dynamic> jsonData = json.decode(cacheData);
+                BaseBean bean = BaseBean<T>.fromJson(jsonData);
+                controller.add(new ResponseDates(
+                    ResponseTypes.CACHE, _transformation(bean.data)));
+              } else {
+                //不存在缓存返回错误
+                controller.add(ResponseDates(ResponseTypes.CACHE, null,
+                    error: Constants.error_01,
+                    statusCode: Constants.responseCodeNoCache));
+              }
+            }
+          }
+          break;
+        case CacheMode.FIRST_CACHE_THEN_REQUEST:
+          if (connectivityResult == ConnectivityResult.mobile ||
+              connectivityResult == ConnectivityResult.wifi) {
+            //先获取缓存,在获取网络数据
+            var cacheData = await RxDioConfig.instance
+                .getCacheInterface()
+                ?.getCache(_url, _params);
+            if (cacheData != null) {
+              if (cacheData.isNotEmpty) {
+                //存在缓存返回缓存
+                Map<String, dynamic> jsonData = json.decode(cacheData);
+                BaseBean bean = BaseBean<T>.fromJson(jsonData);
+                controller.add(new ResponseDates(
+                    ResponseTypes.CACHE, _transformation(bean.data)));
+              }
+              NetworkManager.instance
+                  .request<T>(_url,
+                      params: _params,
+                      method: _httpMethod,
+                      host: _host,
+                      options: _options,
+                      cancelToken: _cancelToken)
+                  .then((data) {
+                if (!controller.isClosed) {
+                  controller.add(new ResponseDates(
+                      ResponseTypes.NETWORK, _transformation(data)));
+                }
+              }, onError: (error) {
+                if (!controller.isClosed) {
+                  controller.add(new ResponseDates(ResponseTypes.ERROR, null,
+                      error: error.toString(),
+                      statusCode: Constants.responseCodeNetworkError));
+                }
+              });
             } else {
               //不存在缓存返回错误
-              controller.add(ResponseDatas(ResponseTypes.CACHE, null,
-                  statusCode: Constants.responseCodeNoCache,
-                  error: Constants.error_01));
+              if (!controller.isClosed) {
+                controller.add(ResponseDates(ResponseTypes.CACHE, null,
+                    statusCode: Constants.responseCodeNoCache,
+                    error: Constants.error_01));
+              }
             }
-          }, onError: (error) {
-            controller.add(new ResponseDatas(ResponseTypes.ERROR, null,
-                error: error.toString(),
-                statusCode: Constants.responseCodeNetworkError));
-          });
-        }
-        break;
+            break;
+          }
+      }
+      yield* controller.stream;
+      controller.close();
+    } on Exception catch (e) {
+      print("Exception : $e \n");
+    } finally {
+      if (_cancelToken != null && _cancelToken!.isCancelled) {
+        _cancelToken?.cancel();
+      }
     }
-
-    yield* controller.stream;
-    controller.close();
   }
 
   //网络请求以及数据流程控制
-  Future<ResponseDatas<T>> asFuture<T>() async {
-    return await asStreams<T>().last;
+  Future<ResponseDates<T>> asFuture<T>() async {
+    return await asStreams<T>().first;
   }
 
   //生命周期结束

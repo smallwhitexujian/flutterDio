@@ -1,12 +1,12 @@
 ///构造一个Response数据模型，
-class ResponseDatas<T> {
+class ResponseDates<T> {
   late ResponseTypes responseType;
   late int? statusCode;
   late String error;
   late T? data;
 
   //创建请求对象
-  ResponseDatas(ResponseTypes responseType, T? data,
+  ResponseDates(ResponseTypes responseType, T? data,
       {int? statusCode = 200, String error = ""}) {
     this.responseType = responseType;
     this.statusCode = statusCode;

@@ -2,11 +2,25 @@
 
 根据Dio封装网络情况库。[仓库地址](https://gitee.com/xjdd/flutter-rx-dio)
 
-1. 简单封装dio,
+1. 封装dio,
 2. 通过stream和future 实现数据流转以及监听
 3. 通过抽象类实现json解析
+4. 扩展CacheInterface接口，本方案默认接口缓存方案为sqlite缓存，也可以不使用缓存，如需要自己实现缓存需要继承
+cacheInterface实现接口方法即可。
 
 ## [English documents](/CHANGELOG.md)
+
+## [1.2.0]-2022-12-14
+
+1. 升级`cacheInterface`可以支持外部自己创建缓存模型，默认执行sqlite缓存，
+2. 调整api调用时机，优化内存释放，
+3. CacheSQLImpL 数据库缓存数据，相同的key默认覆盖value，不同key会重新生成一个新的数据
+4. 支持实现`CacheInterface接口`，或者继承`CacheInterface抽象类`，实现后可以设置到`RxDioConfig.setCacheImpl()`,并且需要开启`RxDioConfig.setUserCacheConfig(true)`;
+5. 支持实现`CacheInterceptorInterface抽象类`，只需要自己实现`saveCache(path,params,data)`即可实现快速缓存
+
+## [1.1.6]-2022-03-31
+
+1. asStreams.last => asStreams.first
 
 ## [1.1.5]-2022-03-2
 
@@ -79,7 +93,7 @@ RxDio<WanbeanEntity>()
 - FIRST_CACHE_THEN_REQUEST:优先触发缓存数据同时在请求网络数据会触发刷新两次,如果缓存不存在直接触发网络数据.然后在网络拦截器里面进行拦截缓存到sqlite
 
 ```dart
-..setTransFrom((streamData) {
+setTransFrom((streamData) {
   //TODO 这里StreamData返回是当前请求返回的对象,可以进行修改对象，返回一个修改后的对象
   return streamData;
 })

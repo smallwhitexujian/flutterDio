@@ -1,29 +1,32 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
-import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
-import 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
+import 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheSQLImpL.dart';
+import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
+import 'package:flutter_dio_module/lib_dio.dart';
+
 
 class RxDioConfig {
   //是否是debug模式
   bool _isDebug = false;
 
   //是否使用缓存模型
-  bool _isUserCache = true;
+  bool _isUserCache = false;
 
   String _baseUrl = "";
 
   late IJsonConvert _iJsonConvert; //解析关键
 
-  factory RxDioConfig() => _getIntstance();
+  ///缓存实现
+  CacheInterface? _cacheInterface;
 
-  static RxDioConfig get intstance => _getIntstance();
+  factory RxDioConfig() => _getInstance();
+
+  static RxDioConfig get instance => _getInstance();
   static RxDioConfig? _instance;
 
-  RxDioConfig._create() {
-    init();
-  }
+  RxDioConfig._create();
 
-  static RxDioConfig _getIntstance() {
+  static RxDioConfig _getInstance() {
     if (_instance == null) {
       _instance = new RxDioConfig._create();
     }
@@ -58,8 +61,19 @@ class RxDioConfig {
     this._isUserCache = isUserCache;
   }
 
-  bool getCahceState() {
+  bool getCacheState() {
     return _isUserCache;
+  }
+
+  void setCacheImpl(CacheInterface cacheInterface) {
+    this._cacheInterface = cacheInterface;
+  }
+
+  CacheInterface? getCacheInterface() {
+    if (_cacheInterface == null) {
+      _cacheInterface = CacheSQLImpL(DatabaseSql());
+    }
+    return _cacheInterface;
   }
 
   ///[Interceptors] interceptors 拦截器
@@ -72,9 +86,8 @@ class RxDioConfig {
     NetworkManager.instance.setInterceptors(interceptors);
   }
 
-  init() {
-    if (_isUserCache) {
-      CacheManagers.init(); //初始化缓存数据库
-    }
+  ///[cacheInterceptor] 缓存拦截器，实现抽象类CacheInterceptorInterface类
+  void setCacheInterceptor(CacheInterceptor cacheInterceptor) {
+    setCacheInterceptor(cacheInterceptor);
   }
 }

@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
-
-//网络日志拦截
+///网络请求log日志打印
 class HttpLogInterceptor extends Interceptor {
   var isDebug = true;
+
+  ///[debug] 是否打印日志
   HttpLogInterceptor(bool debug) {
     this.isDebug = debug;
   }
@@ -57,12 +58,12 @@ class HttpLogInterceptor extends Interceptor {
         "- URL:\n${response.requestOptions.uri}\n";
     responseStr += "- HEADER:\n{";
     response.headers.forEach(
-        (key, list) => responseStr += "\n  " + "\"$key\" : \"$list\",");
-    responseStr += "\n}\n";
-    responseStr += "- STATUS: ${response.statusCode}\n";
+        (key, list) => responseStr += "\n" + "\"$key\" : \"$list\",\n");
+    responseStr += "}\n";
+    responseStr += "- STATUS:\n ${response.statusCode}\n";
 
     if (response.data != null) {
-      responseStr += "- BODY:\n ${_parseResponse(response)}";
+      responseStr += "- BODY:\n ${_parseResponse(response)}\n";
     }
     if (isDebug) {
       printWrapped(responseStr);

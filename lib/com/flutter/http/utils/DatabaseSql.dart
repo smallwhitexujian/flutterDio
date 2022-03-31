@@ -3,18 +3,22 @@ import 'package:path/path.dart';
 
 ///数据库做缓存sqlite
 class DatabaseSql {
-  static late Database database;
-  static bool isDatabaseReady = false;
-  static int dbVersion = 1;
-  static String dbName = "httpCache.db";
-  static String dbTableName = "HttpCache";
+  Database? database;
+  bool isDatabaseReady = false;
+  int dbVersion = 1;
+  String dbName = "httpCache.db";
+  String dbTableName = "HttpCache";
 
-  // 初始化
-  static Future initDatabase() {
+  DatabaseSql(){
+    initDatabase();
+  }
+
+  /// 初始化
+  Future initDatabase() {
     Future future = new Future(() async {
       String databasePath = await createDatabase();
       Database database = await openCacheDatabase(databasePath);
-      DatabaseSql.database = database;
+      this.database = database;
       isDatabaseReady = true;
       print("====数据库初始化完毕==>");
       return "0";
@@ -22,39 +26,44 @@ class DatabaseSql {
     return future;
   }
 
-  //创建数据库
-  static Future<String> createDatabase() async {
+  ///创建数据库
+   Future<String> createDatabase() async {
     //获取数据库基本路径
     var databasePath = await getDatabasesPath();
     //创建数据的表名
     return join(databasePath, dbName);
   }
 
-  //删除数据库
-  static delDB() async {
+  ///删除数据库
+  delDB() async {
     createDatabase().then((path) => {deleteDatabase(path)});
   }
 
-  //删除表
-  static Future clearData(Database db) async {
-    await database
-        .rawQuery('SELECT * FROM $dbTableName limit 1')
-        .then((list) => {closeDb(db, list)});
+  ///删除表
+  Future<bool?> clearData(Database? db) async {
+    return await database
+        ?.rawQuery('SELECT * FROM $dbTableName limit 1')
+        .then((value) {
+      return closeDb(db, value);
+    });
   }
 
-  //删除表并关闭数据库
-  static Set<Map<String, dynamic>> closeDb(
-      Database db, List<Map<String, dynamic>> list) {
-    if (list.length > 0) {
+  ///删除表并关闭数据库
+  Future<bool> closeDb(
+      Database? db, List<Map<String, dynamic>> list) async {
+    if (list.length > 0 && db != null) {
       db.execute('DROP TABLE $dbTableName');
       db.close();
       deleteDatabase(db.path);
+      isDatabaseReady = false;
+    } else {
+      return false;
     }
-    return new Set<Map<String, dynamic>>();
+    return true;
   }
 
-  //打开数据库
-  static Future<Database> openCacheDatabase(String paths) async {
+  ///打开数据库
+  Future<Database> openCacheDatabase(String paths) async {
     Database database =
         await openDatabase(paths, singleInstance: false, version: dbVersion,
             //如果没有表则创建表
@@ -70,16 +79,15 @@ class DatabaseSql {
   }
 
   //关闭数据库
-  static closeDatabase(Database db) async {
+  closeDatabase(Database db) async {
+    isDatabaseReady = false;
     return db.close();
   }
 
-  /*
-   * 查询 单条数据
-   */
-  static Future<String> queryHttp(Database database, String cacheKey) async {
+  //查询单条数据
+  Future<String?> queryHttp(Database? database, String cacheKey) async {
     return await database
-        .rawQuery('SELECT value FROM $dbTableName WHERE cacheKey = \'' +
+        ?.rawQuery('SELECT value FROM $dbTableName WHERE cacheKey = \'' +
             cacheKey +
             "\'")
         .then((value) {
@@ -91,22 +99,18 @@ class DatabaseSql {
     });
   }
 
-  /*
-   * 查询
-   */
-  static Future<List<Map<String, dynamic>>> queryAll(
+  ///查询
+  Future<List<Map<String, dynamic>>> queryAll(
       Database database, String cacheKey) async {
     return await database.rawQuery(
         'SELECT value FROM $dbTableName WHERE cacheKey = \'' + cacheKey + "\'");
   }
 
-  /*
-   * 插入
-   */
-  static Future<int> insertHttp(
-      Database database, String cacheKey, String value) async {
+  ///插入
+  Future<int?> insertHttp(
+      Database? database, String cacheKey, String value) async {
     cacheKey = cacheKey.replaceAll("\"", "\"\"");
-    return await database.transaction((txn) async {
+    return await database?.transaction((txn) async {
       return await txn.rawInsert(
           'INSERT INTO $dbTableName(cacheKey, value) VALUES( \'' +
               cacheKey +
@@ -116,10 +120,8 @@ class DatabaseSql {
     });
   }
 
-  /*
-   * 更新
-   */
-  static Future<int> updateHttp(
+  ///更新
+  Future<int> updateHttp(
       Database? database, String cacheKey, String value) async {
     cacheKey = cacheKey.replaceAll("\"", "\\\"");
     return await database!.rawUpdate('UPDATE $dbTableName SET '
@@ -131,10 +133,8 @@ class DatabaseSql {
         '\'');
   }
 
-  /*
-   * 删除
-   */
-  static Future<int> deleteHttpCache(
+  ///删除
+  Future<int> deleteHttpCache(
       Database? database, String cacheKey) async {
     return await database!.rawDelete(
         'DELETE FROM $dbTableName WHERE name = \'' + cacheKey + '\'');

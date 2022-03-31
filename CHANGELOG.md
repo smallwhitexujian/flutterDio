@@ -11,6 +11,18 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
+## [1.2.0] - 2022-12-14
+
+1. Upgrading `cacheInterface` to allow external to create their own caching model, by default performing sqlite caching,
+2. Adjust api call timing, optimize memory release,
+3. The CacheSQLImpL database caches data. The same key overwrites the value by default
+4. Support for implementing `CacheInterface` Interface, or inheriting `CacheInterface` Abstract class, After implementation can be set to ` RxDioConfig.SetCacheImpl() ` , and the need to open `RxDioConfig.SetUserCacheConfig(true)` ;
+5. Support to implement ` CacheInterceptorInterface` abstract class , only need to implement ` saveCache (path, params, data) ` fast cache can be realized
+
+## [1.1.6]-2022-03-31
+
+1. asStreams.last => asStreams.first
+
 ## [1.1.5]-2022-03-22
 
 1. Modify NetworkManager.dart adds body data, which was not supported before
@@ -66,7 +78,7 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 - FIRST_CACHE_THEN_REQUEST: trigger cache data first while requesting network data will trigger refresh twice, if cache does not exist, directly trigger network data. Then intercept the cache to sqlite in the network interceptor.
 
 ```dart
-..setTransFrom((streamData) {
+setTransFrom((streamData) {
   //TODO 这里StreamData返回是当前请求返回的对象,可以进行修改对象，返回一个修改后的对象
   return streamData;
 })

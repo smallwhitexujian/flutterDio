@@ -1,24 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
+import 'package:flutter_dio_module/com/flutter/http/interceptorss/HttpLogInterceptor.dart';
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 
 void main() => Global.init().then((e) => runApp(MyApp()));
 
-class jsonbase extends IJsonConvert {
+class JsonBase extends IJsonConvert {
   @override
   M? fromJsonAsT<M>(json) {
-    return JsonConvert().fromJsonAsT(json);
+    return JsonConvert.fromJsonAsT(json);
   }
 }
 
 class Global {
   static Future init() async {
-    return RxDioConfig.intstance
-      ..setDebugConfig(true)
-      ..setJsonConvert(jsonbase())
-      ..setHost("https://wanandroid.com/")
-      ..setUserCacheConfig(true);
+    ///初始化RxDioConfig相关配置
+    return RxDioConfig.instance
+      ..setDebugConfig(false)//是否debug配置
+      ..setJsonConvert(JsonBase())//泛型解析，必须要实现IJsonConvert接口
+      ..setInterceptor(HttpLogInterceptor(false)) //是否打印log日志
+      ..setHost("https://wanandroid.com/")//apHost
+      ..setUserCacheConfig(true);//是否开启缓存，默认false
+  }
+
+  static Stream<ResponseDates<WanbeanEntity>> test() {
+    print("=====>test执行次数");
+    var aaa = RxDio.instance;
+    aaa.setUrl(Constants.config);
+    aaa.setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST);
+    aaa.setRequestMethod(Method.Get);
+    aaa.setTransFrom<WanbeanEntity>((p0) {
+      var a = p0 as WanbeanEntity;
+      print("=====>${a.datas.reversed.first.content}");
+      return p0;
+    });
+    return aaa.asStreams<WanbeanEntity>();
   }
 }
 
@@ -65,19 +84,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
 
-  Stream<ResponseDatas<WanbeanEntity>> test() {
-    var aaa = RxDio.instance;
-    aaa.setUrl(Constants.config);
-    aaa.setCacheMode(CacheMode.DEFAULT);
-    aaa.setRequestMethod(Method.Get);
-    aaa.setTransFrom<WanbeanEntity>((p0) {
-      var a = p0 as WanbeanEntity;
-      return p0;
-    });
-    return aaa.asStreams<WanbeanEntity>();
-  }
-
   var a = 0;
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -85,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      test();
+      // test();
     });
   }
 
@@ -132,14 +140,14 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:$_counter',
             ),
-            StreamBuilder<ResponseDatas<WanbeanEntity>>(
+            StreamBuilder<ResponseDates<WanbeanEntity>>(
               builder: ((context, snapshot) {
                 return Text(
-                  '${snapshot.data?.data?.total}',
+                  '${snapshot.data?.data?.datas.reversed.first.content}',
                   style: Theme.of(context).textTheme.headline4,
                 );
               }),
-              stream: test(),
+              stream: Global.test(),
             ),
           ],
         ),

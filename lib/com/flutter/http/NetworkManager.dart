@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
-import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
-import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
-import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
-import 'interceptorss/HttpLogInterceptor.dart';
+
+import 'RxDioConfig.dart';
+import 'adapter/Method.dart';
+import 'bean/BaseBean.dart';
+import 'cacheUtils/CacheInterceptor.dart';
 
 ///单例模式
 class NetworkManager {
@@ -19,8 +20,8 @@ class NetworkManager {
   BaseOptions? _options;
 
   ///默认的配置
-  BaseOptions defultOptions = BaseOptions(
-    baseUrl: RxDioConfig.intstance.getHost(),
+  BaseOptions defaultOptions = BaseOptions(
+    baseUrl: RxDioConfig.instance.getHost(),
     connectTimeout: 10000, //连接超时
     receiveTimeout: 60000, //接受超时
     responseType: ResponseType.plain,
@@ -34,11 +35,10 @@ class NetworkManager {
   NetworkManager._internal() {
     ///初始化
     _dio = Dio()
-      ..options = _options ?? defultOptions
+      ..options = _options ?? defaultOptions
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor(RxDioConfig.intstance.getDebug()))
-      ..interceptors.add(CacheManagers.createCacheInterceptor());
-    if (RxDioConfig.intstance.getDebug()) {
+      ..interceptors.add(CacheInterceptor());
+    if (RxDioConfig.instance.getDebug()) {
       // 在isDebug模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
       (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (client) {
@@ -71,7 +71,8 @@ class NetworkManager {
     return _instance!;
   }
 
-  // 创建全局的拦截器(默认拦截器)
+  /// 创建全局的拦截器(默认拦截器)
+  /// 判断拦截器是否已经加入，已经加入了就不会再次添加拦截器
   void setInterceptor(Interceptor? interceptor) {
     List<Interceptor> interceptors = [];
     bool isContainer = interceptors.contains(interceptor); //去重
@@ -85,7 +86,7 @@ class NetworkManager {
     }
   }
 
-// 创建全局的拦截器(默认拦截器)
+  /// 创建全局的拦截器(默认拦截器)
   void setInterceptors(Interceptors interceptors) {
     // 统一添加到拦截区中
     bool isContainer = _dio.interceptors.contains(interceptors); //去重
@@ -109,12 +110,16 @@ class NetworkManager {
     CancelToken? cancelToken,
   }) async {
     //对请求域名做切换
-    if (host.isEmpty) {
-      //域名为空的时候获取配置接口
-      _dio.options.baseUrl = RxDioConfig.intstance.getHost();
+    if (url.contains("http://") || url.contains("https://")) {
+      _dio.options.baseUrl = "";
     } else {
-      //域名有值则直接获取域名
-      _dio.options.baseUrl = host;
+      if (host.isEmpty) {
+        //域名为空的时候获取配置接口
+        _dio.options.baseUrl = RxDioConfig.instance.getHost();
+      } else {
+        //域名有值则直接获取域名
+        _dio.options.baseUrl = host;
+      }
     }
     // 返回结果，String类型
     Response<String> response;
@@ -154,6 +159,7 @@ class NetworkManager {
       //这里判断是网络状态，并不是业务状态
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.toString());
+        //对象数据类型
         BaseBean bean = BaseBean<T>.fromJson(data);
         if (bean.isSuccess()) {
           /// 返回泛型Bean
