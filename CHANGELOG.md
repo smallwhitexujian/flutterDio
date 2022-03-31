@@ -11,6 +11,10 @@ And the project follows [semantic version Control] (<https://semver.org/spec/v2.
 
 ## [中文文档](/CHANGELOG_cn.md)
 
+## [1.1.6]-2022-03-31
+
+1. asStreams.last => asStreams.first
+
 ## [1.1.5]-2022-03-22
 
 1. Modify NetworkManager.dart adds body data, which was not supported before

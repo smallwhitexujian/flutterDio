@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
@@ -8,15 +10,16 @@ void main() => Global.init().then((e) => runApp(MyApp()));
 class jsonbase extends IJsonConvert {
   @override
   M? fromJsonAsT<M>(json) {
-    return JsonConvert().fromJsonAsT(json);
+    return JsonConvert.fromJsonAsT(json);
   }
 }
 
 class Global {
   static Future init() async {
     return RxDioConfig.intstance
-      ..setDebugConfig(true)
+      ..setDebugConfig(false)
       ..setJsonConvert(jsonbase())
+      ..setInterceptor(HttpLogInterceptor(true))
       ..setHost("https://wanandroid.com/")
       ..setUserCacheConfig(true);
   }
@@ -64,7 +67,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
-
   Stream<ResponseDatas<WanbeanEntity>> test() {
     var aaa = RxDio.instance;
     aaa.setUrl(Constants.config);

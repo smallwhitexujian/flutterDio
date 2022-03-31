@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,7 +8,6 @@ import 'package:flutter_dio_module/com/flutter/http/RxDioConfig.dart';
 import 'package:flutter_dio_module/com/flutter/http/adapter/Method.dart';
 import 'package:flutter_dio_module/com/flutter/http/bean/BaseBean.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/CacheManagers.dart';
-import 'interceptorss/HttpLogInterceptor.dart';
 
 ///单例模式
 class NetworkManager {
@@ -36,7 +36,7 @@ class NetworkManager {
     _dio = Dio()
       ..options = _options ?? defultOptions
       // //拦截器
-      ..interceptors.add(HttpLogInterceptor(RxDioConfig.intstance.getDebug()))
+      // ..interceptors.add(HttpLogInterceptor(RxDioConfig.intstance.getDebug()))
       ..interceptors.add(CacheManagers.createCacheInterceptor());
     if (RxDioConfig.intstance.getDebug()) {
       // 在isDebug模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
@@ -109,12 +109,16 @@ class NetworkManager {
     CancelToken? cancelToken,
   }) async {
     //对请求域名做切换
-    if (host.isEmpty) {
-      //域名为空的时候获取配置接口
-      _dio.options.baseUrl = RxDioConfig.intstance.getHost();
+    if (url.contains("http://") || url.contains("https://")) {
+      _dio.options.baseUrl = "";
     } else {
-      //域名有值则直接获取域名
-      _dio.options.baseUrl = host;
+      if (host.isEmpty) {
+        //域名为空的时候获取配置接口
+        _dio.options.baseUrl = RxDioConfig.intstance.getHost();
+      } else {
+        //域名有值则直接获取域名
+        _dio.options.baseUrl = host;
+      }
     }
     // 返回结果，String类型
     Response<String> response;
@@ -154,6 +158,7 @@ class NetworkManager {
       //这里判断是网络状态，并不是业务状态
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.toString());
+        //对象数据类型
         BaseBean bean = BaseBean<T>.fromJson(data);
         if (bean.isSuccess()) {
           /// 返回泛型Bean

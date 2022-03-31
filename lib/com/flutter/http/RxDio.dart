@@ -223,7 +223,7 @@ class RxDio {
 
   //网络请求以及数据流程控制
   Future<ResponseDatas<T>> asFuture<T>() async {
-    return await asStreams<T>().last;
+    return await asStreams<T>().first;
   }
 
   //生命周期结束
