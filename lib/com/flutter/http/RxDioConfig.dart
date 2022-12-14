@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
-import 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheSQLImpL.dart';
+import 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheSQLImpl.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 

@@ -31,6 +31,11 @@
 |   |           |   '-- ResponseDatas.dart
 |   |           |-- bean
 |   |           |   '-- BaseBean.dart
+|   |           |-- cacheUtils
+|   |           |   '-- CacheInterceptor.dart
+|   |           |   '-- CacheInterceptorInterface.dart
+|   |           |   '-- CacheInterface.dart
+|   |           |   '-- CacheSQLImpl.dart
 |   |           |-- interceptorss
 |   |           |   '-- HttpLogInterceptor.dart
 |   |           |-- interface
