@@ -9,7 +9,7 @@ class DatabaseSql {
   String dbName = "httpCache.db";
   String dbTableName = "HttpCache";
 
-  DatabaseSql(){
+  DatabaseSql() {
     initDatabase();
   }
 
@@ -27,7 +27,7 @@ class DatabaseSql {
   }
 
   ///创建数据库
-   Future<String> createDatabase() async {
+  Future<String> createDatabase() async {
     //获取数据库基本路径
     var databasePath = await getDatabasesPath();
     //创建数据的表名
@@ -49,8 +49,7 @@ class DatabaseSql {
   }
 
   ///删除表并关闭数据库
-  Future<bool> closeDb(
-      Database? db, List<Map<String, dynamic>> list) async {
+  Future<bool> closeDb(Database? db, List<Map<String, dynamic>> list) async {
     if (list.length > 0 && db != null) {
       db.execute('DROP TABLE $dbTableName');
       db.close();
@@ -134,8 +133,7 @@ class DatabaseSql {
   }
 
   ///删除
-  Future<int> deleteHttpCache(
-      Database? database, String cacheKey) async {
+  Future<int> deleteHttpCache(Database? database, String cacheKey) async {
     return await database!.rawDelete(
         'DELETE FROM $dbTableName WHERE name = \'' + cacheKey + '\'');
   }

@@ -13,8 +13,7 @@ class BaseBean<T> {
 
   BaseBean.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null && json['data'] != 'null') {
-      data =
-          RxDioConfig.instance.getJsonConvert().fromJsonAsT<T>(json['data']);
+      data = RxDioConfig.instance.getJsonConvert().fromJsonAsT<T>(json['data']);
     }
     code = json['code'] ?? json['errorCode'];
     message = json['message'] ?? json['errorMsg'];

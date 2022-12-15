@@ -1,6 +1,6 @@
 # 变更日志
 
-根据Dio封装网络情况库。[仓库地址](https://gitee.com/xjdd/flutter-rx-dio)
+根据Dio封装网络情况库。[仓库地址](https://github.com/smallwhitexujian/flutterDio.git)
 
 1. 封装dio,
 2. 通过stream和future 实现数据流转以及监听
@@ -8,7 +8,7 @@
 4. 扩展CacheInterface接口，本方案默认接口缓存方案为sqlite缓存，也可以不使用缓存，如需要自己实现缓存需要继承
 cacheInterface实现接口方法即可。
 
-## [English documents](/CHANGELOG.md)
+## [English documents](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG.md)
 
 ## [1.2.0]-2022-12-14
 

@@ -1,15 +1,13 @@
 # change Log
 
-Encapsulate the network condition library according to Dio. [warehouse address] (<https://gitee.com/xjdd/flutter-rx-dio>).
+Encapsulate the network condition library according to Dio. [warehouse address] (<https://github.com/smallwhitexujian/flutterDio.git>).
 
 1. Simple package dio.
 2. Data transfer and monitoring through stream and future.
 3. Implement json parsing through abstract classes.
 
-The format is based on [Keep a Changelog] (<https://keepachangelog.com/en/1.0.0/>).
-And the project follows [semantic version Control] (<https://semver.org/spec/v2.0.0.html>).
 
-## [中文文档](/CHANGELOG_cn.md)
+## [中文文档](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG_cn.md)
 
 ## [1.2.0] - 2022-12-14
 
