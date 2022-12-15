@@ -8,7 +8,7 @@
 [pub.flutter.io](https://pub.flutter-io.cn/packages/flutter_dio_module/score)
 
 ```dart
-  flutter_dio_module: ^1.2.0
+  flutter_dio_module: ^1.2.1
 ```
 
 ## 项目目录结构
