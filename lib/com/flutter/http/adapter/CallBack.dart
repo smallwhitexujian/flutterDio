@@ -1,4 +1,3 @@
-
 import 'package:flutter_dio_module/lib_dio.dart';
 
 typedef NetCallbackFunction<T> = void Function(ResponseDates<T>?);

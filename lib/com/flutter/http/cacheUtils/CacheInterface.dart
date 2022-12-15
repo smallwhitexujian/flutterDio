@@ -1,9 +1,6 @@
-
-
 import 'package:flutter_dio_module/lib_dio.dart';
 
 abstract class CacheInterface {
-
   ///获取cacheKeyFromPath 根据请求地址和参数生成缓存key
   String getCacheKayFromPath(String? path, Map<String, dynamic>? params) {
     String cacheKey = "";
@@ -30,9 +27,8 @@ abstract class CacheInterface {
   }
 
   ///保存缓存，
-  void saveCache(String path, Map<String, dynamic>? params, String value) async {
-
-  }
+  void saveCache(
+      String path, Map<String, dynamic>? params, String value) async {}
 
   ///清楚缓存，默认返回false 操作成功返回true
   Future<bool?> clearCache() async {

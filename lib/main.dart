@@ -19,11 +19,11 @@ class Global {
   static Future init() async {
     ///初始化RxDioConfig相关配置
     return RxDioConfig.instance
-      ..setDebugConfig(false)//是否debug配置
-      ..setJsonConvert(JsonBase())//泛型解析，必须要实现IJsonConvert接口
+      ..setDebugConfig(false) //是否debug配置
+      ..setJsonConvert(JsonBase()) //泛型解析，必须要实现IJsonConvert接口
       ..setInterceptor(HttpLogInterceptor(false)) //是否打印log日志
-      ..setHost("https://wanandroid.com/")//apHost
-      ..setUserCacheConfig(true);//是否开启缓存，默认false
+      ..setHost("https://wanandroid.com/") //apHost
+      ..setUserCacheConfig(true); //是否开启缓存，默认false
   }
 
   static Stream<ResponseDates<WanbeanEntity>> test() {

@@ -4,7 +4,6 @@ import 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheSQLImpl.dart
 import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 
-
 class RxDioConfig {
   //是否是debug模式
   bool _isDebug = false;
