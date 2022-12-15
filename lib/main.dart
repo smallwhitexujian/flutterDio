@@ -30,7 +30,7 @@ class Global {
     print("=====>test执行次数");
     var aaa = RxDio.instance;
     aaa.setUrl(Constants.config);
-    aaa.setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST);
+    aaa.setCacheMode(CacheMode.DEFAULT);
     aaa.setRequestMethod(Method.Get);
     aaa.setTransFrom<WanbeanEntity>((p0) {
       var a = p0 as WanbeanEntity;

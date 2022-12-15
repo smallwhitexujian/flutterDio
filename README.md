@@ -171,7 +171,7 @@ Column(
           style: Theme.of(context).textTheme.headline4,
         );
       }),
-      stream: test(),
+      stream:test(),
     ),
   ],
 )
