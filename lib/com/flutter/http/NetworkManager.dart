@@ -26,7 +26,11 @@ class NetworkManager {
     receiveTimeout: 60000, //接受超时
     responseType: ResponseType.plain,
     sendTimeout: 10000,
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials":"false",//该字段可选。它的值是一个布尔值，表示是否允许发送 Cookie。默认情况下，Cookie 不包括在 CORS 请求之中。设为 true，即表示服务器明确许可，Cookie 可以包含在请求中，一起发给服务器。
+      "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+      "Access-Control-Allow-Methods": "POST, OPTIONS,GET"},
   );
 
   ///可以取消的token
@@ -156,6 +160,7 @@ class NetworkManager {
               cancelToken: cancelToken);
           break;
       }
+      response.headers.add('Access-Control-Allow-Origin', '*');
       //这里判断是网络状态，并不是业务状态
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.toString());
