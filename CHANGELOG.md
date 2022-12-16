@@ -9,7 +9,7 @@ Encapsulate the network condition library according to Dio. [warehouse address] 
 
 ## [中文文档](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG_cn.md)
 
-## [1.2.0] - 2022-12-14
+## [1.2.2] - 2022-12-16
 
 1. Upgrading `cacheInterface` to allow external to create their own caching model, by default performing sqlite caching,
 2. Adjust api call timing, optimize memory release,

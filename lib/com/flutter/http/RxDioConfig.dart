@@ -16,7 +16,7 @@ class RxDioConfig {
   late IJsonConvert _iJsonConvert; //解析关键
 
   ///缓存实现
-  CacheInterface? _cacheInterface;
+  CacheInterfaces? _cacheInterface;
 
   factory RxDioConfig() => _getInstance();
 
@@ -64,11 +64,11 @@ class RxDioConfig {
     return _isUserCache;
   }
 
-  void setCacheImpl(CacheInterface cacheInterface) {
+  void setCacheImpl(CacheInterfaces cacheInterface) {
     this._cacheInterface = cacheInterface;
   }
 
-  CacheInterface? getCacheInterface() {
+  CacheInterfaces? getCacheInterface() {
     if (_cacheInterface == null) {
       _cacheInterface = CacheSQLImpL(DatabaseSql());
     }

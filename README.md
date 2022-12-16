@@ -8,7 +8,7 @@
 [pub.flutter.io](https://pub.flutter-io.cn/packages/flutter_dio_module/score)
 
 ```dart
-  flutter_dio_module: ^1.2.1
+  flutter_dio_module: ^1.2.2
 ```
 
 ## 项目目录结构
@@ -28,13 +28,13 @@
 |   |           |-- adapter
 |   |           |   |-- CallBack.dart
 |   |           |   |-- Method.dart
-|   |           |   '-- ResponseDatas.dart
+|   |           |   '-- ResponseDates.dart
 |   |           |-- bean
 |   |           |   '-- BaseBean.dart
 |   |           |-- cacheUtils
 |   |           |   '-- CacheInterceptor.dart
 |   |           |   '-- CacheInterceptorInterface.dart
-|   |           |   '-- CacheInterface.dart
+|   |           |   '-- CacheInterfaces.dart
 |   |           |   '-- CacheSQLImpl.dart
 |   |           |-- interceptorss
 |   |           |   '-- HttpLogInterceptor.dart
