@@ -3,10 +3,10 @@ import 'dart:async';
 import '../RxDioConfig.dart';
 import '../utils/DatabaseSql.dart';
 import '../utils/MD5Utils.dart';
-import 'CacheInterface.dart';
+import 'CacheInterfaces.dart';
 
 /// 数据库本地缓存sqlite
-class CacheSQLImpL extends CacheInterface {
+class CacheSQLImpL extends CacheInterfaces {
   DatabaseSql? databaseSql;
 
   CacheSQLImpL(DatabaseSql? databaseSql) {

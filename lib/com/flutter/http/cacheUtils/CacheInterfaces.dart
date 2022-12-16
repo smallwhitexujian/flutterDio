@@ -1,6 +1,6 @@
 import 'package:flutter_dio_module/lib_dio.dart';
 
-abstract class CacheInterface {
+abstract class CacheInterfaces {
   ///获取cacheKeyFromPath 根据请求地址和参数生成缓存key
   String getCacheKayFromPath(String? path, Map<String, dynamic>? params) {
     String cacheKey = "";
