@@ -47,6 +47,7 @@ dependencies:
   convert: ^3.0.1
   crypto: ^3.0.1
   path: ^1.8.0
+  shelf_proxy: ^1.0.2
 
 dev_dependencies:
   flutter_test:
