@@ -10,7 +10,7 @@ cacheInterface实现接口方法即可。
 
 ## [English documents](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG.md)
 
-## [1.2.2]-2022-12-16
+## [1.2.3]-2022-12-16
 
 1. 升级`cacheInterface`可以支持外部自己创建缓存模型，默认执行sqlite缓存，
 2. 调整api调用时机，优化内存释放，

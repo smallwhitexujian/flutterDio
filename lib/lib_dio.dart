@@ -12,6 +12,7 @@ export 'com/flutter/http/adapter/ResponseDates.dart';
 export 'package:flutter_dio_module/generated/json/base/i_json_convert.dart';
 export 'package:flutter_dio_module/generated/json/base/base_convert.g.dart';
 
+export 'package:flutter_dio_module/com/flutter/http/interceptorss/HttpLogInterceptor.dart';
 export 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheInterfaces.dart';
 export 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheInterceptorInterface.dart';
 export 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheInterceptor.dart';
