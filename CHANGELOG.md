@@ -9,6 +9,53 @@ Encapsulate the network condition library according to Dio. [warehouse address] 
 
 ## [中文文档](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG_cn.md)
 
+## [1.2.4]-2023-02-06
+
+1. add methods `uploadUrl` 
+```Dart
+///文件上传
+  ///[apiurl] 上传地址
+  ///[formDate] 上传文件格式化
+  ///[progressCallBack] 上传进度条
+  Future<T> uplaodFile<T>({
+    required String apiUrl, //api地址
+    Map<String, dynamic>? params, //参数
+    ProgressCallBack? progressCallBack, //进度条
+    required FormData? formData,
+    Options? options, //设置
+  }) async {
+    return await dioConfig(
+            apiUrl: apiUrl,
+            params: params,
+            progressCallBack: progressCallBack,
+            formData: formData,
+            options: options)!
+        .uploadUrl<T>();
+  }
+```
+2. add methods `downloadFile`
+```Dart 
+///文件下载
+  ///[apiUrl] 上传地址
+  ///[savePath] 保存路径
+  ///[progressCallBack] 上传进度条
+  Future<T> downloadFile<T>({
+    required String apiUrl, //api地址
+    Map<String, dynamic>? params, //参数
+    ProgressCallBack? progressCallBack, //进度条
+    required String? savePath,
+    Options? options, //设置
+  }) async {
+    return await dioConfig(
+            apiUrl: apiUrl,
+            params: params,
+            progressCallBack: progressCallBack,
+            savePath: savePath,
+            options: options)!
+        .downloadFile<T>();
+  }
+```
+
 ## [1.2.3] - 2022-12-16
 
 1. Upgrading `cacheInterface` to allow external to create their own caching model, by default performing sqlite caching,
