@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConstants.dart';
 import 'package:flutter_dio_module/com/flutter/http/cacheUtils/CacheSQLImpl.dart';
 import 'package:flutter_dio_module/com/flutter/http/utils/DatabaseSql.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
@@ -26,14 +26,12 @@ class RxDioConfig {
   RxDioConfig._create();
 
   static RxDioConfig _getInstance() {
-    if (_instance == null) {
-      _instance = new RxDioConfig._create();
-    }
+    _instance ??= RxDioConfig._create();
     return _instance!;
   }
 
   void setJsonConvert(IJsonConvert jsonConvert) {
-    this._iJsonConvert = jsonConvert;
+    _iJsonConvert = jsonConvert;
   }
 
   IJsonConvert getJsonConvert() {
@@ -41,7 +39,7 @@ class RxDioConfig {
   }
 
   void setHost(String host) {
-    this._baseUrl = host;
+    _baseUrl = host;
   }
 
   String getHost() {
@@ -49,7 +47,7 @@ class RxDioConfig {
   }
 
   void setDebugConfig(bool isDebug) {
-    this._isDebug = isDebug;
+    _isDebug = isDebug;
   }
 
   bool getDebug() {
@@ -57,21 +55,23 @@ class RxDioConfig {
   }
 
   void setUserCacheConfig(bool isUserCache) {
-    this._isUserCache = isUserCache;
+    _isUserCache = isUserCache;
   }
 
   bool getCacheState() {
     return _isUserCache;
   }
 
+  void setNetworkStatus(int code) {
+    RxDioConstants.networkStatus = code;
+  }
+
   void setCacheImpl(CacheInterfaces cacheInterface) {
-    this._cacheInterface = cacheInterface;
+    _cacheInterface = cacheInterface;
   }
 
   CacheInterfaces? getCacheInterface() {
-    if (_cacheInterface == null) {
-      _cacheInterface = CacheSQLImpL(DatabaseSql());
-    }
+    _cacheInterface ??= CacheSQLImpL(DatabaseSql());
     return _cacheInterface;
   }
 

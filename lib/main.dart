@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dio_module/com/app,data/wanbean_entity.dart';
-import 'package:flutter_dio_module/com/flutter/http/interceptorss/HttpLogInterceptor.dart';
 import 'package:flutter_dio_module/generated/json/base/json_convert_content.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 
