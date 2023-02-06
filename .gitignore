@@ -44,3 +44,11 @@ app.*.symbols
 app.*.map.json
 
 
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+.ios/Flutter/flutter_export_environment.sh
+.ios/Flutter/Generated.xcconfig
+.ios/Flutter/podhelper.rb
+.ios/Runner.xcodeproj/project.pbxproj
+.vscode/settings.json
