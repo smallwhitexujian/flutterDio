@@ -10,6 +10,53 @@ cacheInterface实现接口方法即可。
 
 ## [English documents](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG.md)
 
+## [1.2.4]-2023-02-06
+
+1. 增加`uploadUrl`上传方法
+```Dart
+///文件上传
+  ///[apiurl] 上传地址
+  ///[formDate] 上传文件格式化
+  ///[progressCallBack] 上传进度条
+  Future<T> uplaodFile<T>({
+    required String apiUrl, //api地址
+    Map<String, dynamic>? params, //参数
+    ProgressCallBack? progressCallBack, //进度条
+    required FormData? formData,
+    Options? options, //设置
+  }) async {
+    return await dioConfig(
+            apiUrl: apiUrl,
+            params: params,
+            progressCallBack: progressCallBack,
+            formData: formData,
+            options: options)!
+        .uploadUrl<T>();
+  }
+```
+2. 增加`downloadFile`下载方法
+```Dart 
+///文件下载
+  ///[apiUrl] 上传地址
+  ///[savePath] 保存路径
+  ///[progressCallBack] 上传进度条
+  Future<T> downloadFile<T>({
+    required String apiUrl, //api地址
+    Map<String, dynamic>? params, //参数
+    ProgressCallBack? progressCallBack, //进度条
+    required String? savePath,
+    Options? options, //设置
+  }) async {
+    return await dioConfig(
+            apiUrl: apiUrl,
+            params: params,
+            progressCallBack: progressCallBack,
+            savePath: savePath,
+            options: options)!
+        .downloadFile<T>();
+  }
+```
+
 ## [1.2.3]-2022-12-16
 
 1. 升级`cacheInterface`可以支持外部自己创建缓存模型，默认执行sqlite缓存，
