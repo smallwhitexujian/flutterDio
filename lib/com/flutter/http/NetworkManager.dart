@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dio_module/com/flutter/http/RxDioConstants.dart';
 
 import 'RxDioConfig.dart';
 import 'adapter/Method.dart';
@@ -22,15 +24,22 @@ class NetworkManager {
   ///默认的配置
   BaseOptions defaultOptions = BaseOptions(
     baseUrl: RxDioConfig.instance.getHost(),
-    connectTimeout: 10000, //连接超时
-    receiveTimeout: 60000, //接受超时
+    //连接超时
+    connectTimeout: 10000,
+    //接受超时
+    receiveTimeout: 60000,
     responseType: ResponseType.plain,
+    //发送消息超时
     sendTimeout: 10000,
-    headers: {"Content-Type": "application/json",
+    headers: {
+      "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials":"false",//该字段可选。它的值是一个布尔值，表示是否允许发送 Cookie。默认情况下，Cookie 不包括在 CORS 请求之中。设为 true，即表示服务器明确许可，Cookie 可以包含在请求中，一起发给服务器。
-      "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
-      "Access-Control-Allow-Methods": "POST, OPTIONS,GET"},
+      "Access-Control-Allow-Credentials": "false",
+      //该字段可选。它的值是一个布尔值，表示是否允许发送 Cookie。默认情况下，Cookie 不包括在 CORS 请求之中。设为 true，即表示服务器明确许可，Cookie 可以包含在请求中，一起发给服务器。
+      "Access-Control-Allow-Headers":
+          "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+      "Access-Control-Allow-Methods": "POST, OPTIONS,GET"
+    },
   );
 
   ///可以取消的token
@@ -73,6 +82,10 @@ class NetworkManager {
       _instance = new NetworkManager._internal();
     }
     return _instance!;
+  }
+
+  void setAdapter(HttpClientAdapter adapter) {
+    _dio.httpClientAdapter = adapter;
   }
 
   /// 创建全局的拦截器(默认拦截器)
@@ -160,9 +173,8 @@ class NetworkManager {
               cancelToken: cancelToken);
           break;
       }
-      response.headers.add('Access-Control-Allow-Origin', '*');
       //这里判断是网络状态，并不是业务状态
-      if (response.statusCode == 200) {
+      if (response.statusCode == RxDioConstants.networkStatus) {
         Map<String, dynamic> data = json.decode(response.toString());
         //对象数据类型
         BaseBean bean = BaseBean<T>.fromJson(data);
@@ -184,6 +196,80 @@ class NetworkManager {
         _cancelTokenList.remove(cancelToken);
       }
     }
+  }
+
+  ///上传文件 formData post上传
+  ///[url] 访问地址
+  ///[fromFile] see FormData
+  /// FormData.fromMap({'file': await MultipartFile.fromFile('filePath./text2.txt', filename: 'text2.txt')}
+  /// FormData.fromMap({'files': [await MultipartFile.fromFile('filePath./text2.txt', filename: 'text2.txt')]}
+  ///[onSendProgressCB] 上传进度条回调
+  ///[options] dio请求设置可以设置请求头header等'Content-Type': 'multipart/form-data;BaseOptions
+  ///[queryParameters] 请求参数，可以作用于带参数上传
+  ///e.g await MultipartFile.fromFile(File(filePath), "file"),
+  Future<T> upLoadFile<T>(String url, FormData formData,
+      {Function(int send, int total)? onSendProgressCB,
+      Options? options,
+      Map<String, dynamic>? queryParameters}) async {
+    var cancelToken = CancelToken();
+    try {
+      Response<String> response = await _dio.post(url,
+          data: formData,
+          onSendProgress: onSendProgressCB,
+          options: options,
+          cancelToken: cancelToken,
+          queryParameters: queryParameters);
+      if (response.statusCode == RxDioConstants.networkStatus) {
+        Map<String, dynamic> data = json.decode(response.toString());
+        //对象数据类型
+        BaseBean bean = BaseBean<T>.fromJson(data);
+        if (bean.isSuccess()) {
+          /// 返回泛型Bean
+          return await bean.data as T;
+        } else {
+          return await Future.error(bean.message);
+        }
+      }
+    } on Exception catch (e) {
+      return Future.error(e);
+    } finally {
+      cancelToken.cancel();
+    }
+    return Future.error(e);
+  }
+
+  ///下载文件，
+  ///[url] 下载路径的地址
+  ///[savePath] 保存路径的地址
+  ///[onReceiveProgress] 下载进度回调
+  Future<T> downloadFile<T>(String url, savePath,
+      {Function(int progress, int total)? onReceiveProgress,
+      Options? options,
+      Map<String, dynamic>? queryParameters}) async {
+    var cancelToken = CancelToken();
+    try {
+      Response<dynamic> response = await _dio.download(url, savePath,
+          onReceiveProgress: onReceiveProgress,
+          cancelToken: cancelToken,
+          options: options,
+          queryParameters: queryParameters);
+      if (response.statusCode == RxDioConstants.networkStatus) {
+        Map<String, dynamic> data = json.decode(response.toString());
+        //对象数据类型
+        BaseBean bean = BaseBean<T>.fromJson(data);
+        if (bean.isSuccess()) {
+          /// 返回泛型Bean
+          return await bean.data as T;
+        } else {
+          return await Future.error(bean.message);
+        }
+      }
+    } catch (e) {
+      return Future.error(e);
+    } finally {
+      cancelToken.cancel();
+    }
+    return Future.error(e);
   }
 
   ///取消指定的请求

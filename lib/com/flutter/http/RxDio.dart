@@ -1,42 +1,54 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 import 'package:flutter_dio_module/com/flutter/http/NetworkManager.dart';
 
 ///Dart中一切皆对象，函数也是对象。每个对象都有自己的类型，函数的类型是Function，
 ///typedef就是给Function取个别名，如
 typedef Transformation<T> = T Function(dynamic);
+typedef ProgressCallBack = Function(int progress, int total);
 
 ///Rx + dio 网络请求
 class RxDio {
-  //设置网络请求模型
+  ///设置网络请求模型
   Method _httpMethod = Method.Post;
 
-  //设置默认缓存
+  ///设置默认缓存
   bool isUserCache = true;
 
-  //请求接口地址
+  ///请求接口地址
   String _url = "";
 
-  //请求域名
+  ///请求域名
   String _host = "";
+
+  ///请求上传FormData formData,
+  /// FormData.fromMap({'file': await MultipartFile.fromFile('filePath./text2.txt', filename: 'text2.txt')}
+  /// FormData.fromMap({'files': [await MultipartFile.fromFile('filePath./text2.txt', filename: 'text2.txt')]}
+  FormData? _formData;
+
+  ///进度回调(int progress int total)
+  ProgressCallBack? _progressCallBack;
+
+  ///String savePath 保存下载地址
+  String _savePath = "";
 
   ///dio 相关配置选项
   Options? _options;
 
-  //参数配置
+  ///参数配置
   Map<String, dynamic>? _params;
 
-  //设置缓存模型
+  ///设置缓存模型
   CacheMode _cacheMode = CacheMode.NO_CACHE;
 
-  //取消缓存
+  ///取消缓存
   CancelToken? _cancelToken;
 
-  //json解析
+  ///json解析
   Transformation _transformation = (data) {
     if (data == null) {
       return null;
@@ -46,6 +58,18 @@ class RxDio {
 
   void setRequestMethod(Method method) {
     this._httpMethod = method;
+  }
+
+  void setFormData(FormData? formData) {
+    this._formData = formData;
+  }
+
+  void setProgressCallBack(ProgressCallBack? progressCallBack) {
+    this._progressCallBack = progressCallBack;
+  }
+
+  void setSavePath(String? path) {
+    this._savePath = path ??= "";
   }
 
   void setUrl(String url) {
@@ -80,9 +104,7 @@ class RxDio {
   static RxDio? _instance;
 
   static RxDio _getInstance() {
-    if (_instance == null) {
-      _instance = new RxDio._internal();
-    }
+    _instance ??= RxDio._internal();
     return _instance!;
   }
 
@@ -96,7 +118,7 @@ class RxDio {
   Stream<ResponseDates<T>> asStreams<T>() async* {
     //创建Stream监听,使用Controller的时候一定要close 否者会报错
     StreamController<ResponseDates<T>> controller =
-        new StreamController<ResponseDates<T>>();
+        StreamController<ResponseDates<T>>();
     try {
       if (!RxDioConfig.instance.getCacheState()) {
         _cacheMode = CacheMode.DEFAULT;
@@ -116,10 +138,10 @@ class RxDio {
                   options: _options,
                   cancelToken: _cancelToken)
               .then((data) {
-            controller.add(new ResponseDates<T>(
-                ResponseTypes.NETWORK, _transformation(data)));
+            controller.add(
+                ResponseDates<T>(ResponseTypes.NETWORK, _transformation(data)));
           }, onError: (error) {
-            controller.add(new ResponseDates(ResponseTypes.ERROR, null,
+            controller.add(ResponseDates(ResponseTypes.ERROR, null,
                 error: error.toString(),
                 statusCode: Constants.responseCodeNetworkError));
           });
@@ -137,11 +159,11 @@ class RxDio {
                     cancelToken: _cancelToken ??= CancelToken())
                 .then((data) {
               if (data.runtimeType == T) {
-                controller.add(new ResponseDates(
+                controller.add(ResponseDates(
                     ResponseTypes.NETWORK, _transformation(data)));
               }
             }, onError: (error) {
-              controller.add(new ResponseDates(ResponseTypes.ERROR, null,
+              controller.add(ResponseDates(ResponseTypes.ERROR, null,
                   error: error.toString(),
                   statusCode: Constants.responseCodeNetworkError));
             });
@@ -154,7 +176,7 @@ class RxDio {
                 //存在缓存返回缓存
                 Map<String, dynamic> jsonData = json.decode(cacheData);
                 BaseBean bean = BaseBean<T>.fromJson(jsonData);
-                controller.add(new ResponseDates(
+                controller.add(ResponseDates(
                     ResponseTypes.CACHE, _transformation(bean.data)));
               } else {
                 //不存在缓存返回错误
@@ -177,7 +199,7 @@ class RxDio {
                 //存在缓存返回缓存
                 Map<String, dynamic> jsonData = json.decode(cacheData);
                 BaseBean bean = BaseBean<T>.fromJson(jsonData);
-                controller.add(new ResponseDates(
+                controller.add(ResponseDates(
                     ResponseTypes.CACHE, _transformation(bean.data)));
               }
               NetworkManager.instance
@@ -189,12 +211,12 @@ class RxDio {
                       cancelToken: _cancelToken)
                   .then((data) {
                 if (!controller.isClosed) {
-                  controller.add(new ResponseDates(
+                  controller.add(ResponseDates(
                       ResponseTypes.NETWORK, _transformation(data)));
                 }
               }, onError: (error) {
                 if (!controller.isClosed) {
-                  controller.add(new ResponseDates(ResponseTypes.ERROR, null,
+                  controller.add(ResponseDates(ResponseTypes.ERROR, null,
                       error: error.toString(),
                       statusCode: Constants.responseCodeNetworkError));
                 }
@@ -213,12 +235,41 @@ class RxDio {
       yield* controller.stream;
       controller.close();
     } on Exception catch (e) {
-      print("Exception : $e \n");
+      log("Exception : $e \n");
     } finally {
       if (_cancelToken != null && _cancelToken!.isCancelled) {
         _cancelToken?.cancel();
       }
     }
+  }
+
+  ///上传文件
+  Future<T> uploadUrl<T>() async {
+    if (_formData == null) {
+      throw Exception(
+          "_formData mast not null e.g FormData.fromMap({'file': await MultipartFile.fromFile('filePath./text2.txt', filename: 'text2.txt')}");
+    }
+    if (_url.isEmpty) {
+      throw Exception("_url mast be not null!!!");
+    }
+    return await NetworkManager.instance.upLoadFile<T>(_url, _formData!,
+        onSendProgressCB: _progressCallBack,
+        options: _options,
+        queryParameters: _params);
+  }
+
+  ///下载文件
+  Future<T> downloadFile<T>() async {
+    if (_savePath.isEmpty) {
+      throw Exception("savePath mast be not null!!!");
+    }
+    if (_url.isEmpty) {
+      throw Exception("_url mast be not null!!!");
+    }
+    return await NetworkManager.instance.downloadFile<T>(_url, _savePath,
+        onReceiveProgress: _progressCallBack,
+        options: _options,
+        queryParameters: _params);
   }
 
   //网络请求以及数据流程控制
