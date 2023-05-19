@@ -9,6 +9,8 @@
 cacheInterface实现接口方法即可。
 
 ## [English documents](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG.md)
+## [1.2.5]-2023-05-19
+修改downloadFile 返回解析报错问题，修改为目前只返回code
 
 ## [1.2.4]-2023-02-06
 
