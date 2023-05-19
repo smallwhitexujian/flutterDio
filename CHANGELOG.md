@@ -9,6 +9,10 @@ Encapsulate the network condition library according to Dio. [warehouse address] 
 
 ## [中文文档](https://github.com/smallwhitexujian/flutterDio/blob/main/CHANGELOG_cn.md)
 
+
+## [1.2.5]-2023-05-19
+Modified The problem that only code is returned when a parsing error occurs on downloadFile
+
 ## [1.2.4]-2023-02-06
 
 1. add methods `uploadUrl` 

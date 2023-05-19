@@ -91,25 +91,15 @@ class NetworkManager {
   /// 创建全局的拦截器(默认拦截器)
   /// 判断拦截器是否已经加入，已经加入了就不会再次添加拦截器
   void setInterceptor(Interceptor? interceptor) {
-    List<Interceptor> interceptors = [];
-    bool isContainer = interceptors.contains(interceptor); //去重
-    if (interceptor != null && !isContainer) {
-      //将自定义拦截器加入
-      interceptors.add(interceptor);
-    }
-    bool container = _dio.interceptors.contains(interceptors); //去重
+    bool container = _dio.interceptors.contains(interceptor); //去重
     if (!container) {
-      _dio.interceptors.addAll(interceptors);
+      _dio.interceptors.add(interceptor!);
     }
   }
 
   /// 创建全局的拦截器(默认拦截器)
   void setInterceptors(Interceptors interceptors) {
-    // 统一添加到拦截区中
-    bool isContainer = _dio.interceptors.contains(interceptors); //去重
-    if (!isContainer) {
-      _dio.interceptors.addAll(interceptors);
-    }
+    _dio.interceptors.addAll(interceptors);
   }
 
   ///dio 网络请求 网络请求每个请求配置的优先级最高,其次才是默认配置
@@ -253,23 +243,12 @@ class NetworkManager {
           cancelToken: cancelToken,
           options: options,
           queryParameters: queryParameters);
-      if (response.statusCode == RxDioConstants.networkStatus) {
-        Map<String, dynamic> data = json.decode(response.toString());
-        //对象数据类型
-        BaseBean bean = BaseBean<T>.fromJson(data);
-        if (bean.isSuccess()) {
-          /// 返回泛型Bean
-          return await bean.data as T;
-        } else {
-          return await Future.error(bean.message);
-        }
-      }
+      return response.statusCode as T;
     } catch (e) {
       return Future.error(e);
     } finally {
       cancelToken.cancel();
     }
-    return Future.error(e);
   }
 
   ///取消指定的请求
