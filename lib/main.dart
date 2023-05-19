@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: ((context, snapshot) {
                 return Text(
                   '${snapshot.data?.data?.datas.reversed.first.content}',
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 );
               }),
               stream: Global.test(),

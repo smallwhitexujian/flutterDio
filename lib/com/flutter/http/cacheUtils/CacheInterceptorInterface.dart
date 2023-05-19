@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_dio_module/lib_dio.dart';
 
 abstract class CacheInterceptorInterface implements InterceptorsWrapper {
