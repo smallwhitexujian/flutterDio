@@ -42,5 +42,7 @@ app.*.symbols
 
 # Obfuscation related
 app.*.map.json
-
+.android
+.vscode
+pubspec.lock
 

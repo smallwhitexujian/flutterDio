@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
@@ -170,16 +169,15 @@ class NetworkManager {
         BaseBean bean = BaseBean<T>.fromJson(data);
         if (bean.isSuccess()) {
           /// 返回泛型Bean
-          return await bean.data as T;
+          return bean.data as T;
         } else {
-          return await Future.error(bean.message);
+          return Future.error(bean.message);
         }
       } else {
-        return await Future.error(
-            "服务器错误${response.statusCode},message${response.statusMessage}");
+        return Future.error(response);
       }
     } on DioError catch (error) {
-      return await Future.error(error);
+      return Future.error(error);
     } finally {
       ///请求完成移除cancelToken
       if (_cancelTokenList.contains(cancelToken)) {
@@ -219,13 +217,14 @@ class NetworkManager {
         } else {
           return await Future.error(bean.message);
         }
+      } else {
+        return Future.error(response);
       }
     } on Exception catch (e) {
       return Future.error(e);
     } finally {
       cancelToken.cancel();
     }
-    return Future.error(e);
   }
 
   ///下载文件，
@@ -235,7 +234,8 @@ class NetworkManager {
   Future<T> downloadFile<T>(String url, savePath,
       {Function(int progress, int total)? onReceiveProgress,
       Options? options,
-      Map<String, dynamic>? queryParameters}) async {
+      Map<String, dynamic>? queryParameters,
+      Function(Response<dynamic> response)? resutly}) async {
     var cancelToken = CancelToken();
     try {
       Response<dynamic> response = await _dio.download(url, savePath,
